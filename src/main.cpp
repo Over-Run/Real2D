@@ -19,8 +19,9 @@ using std::endl;
 
 constexpr int DEF_W = 854;
 constexpr int DEF_H = 480;
+constexpr int MAX_TPS = 60;
 
-constexpr float PLAYER_STEP = 2;
+constexpr float PLAYER_STEP = 0.02f;
 
 constexpr float playerH = 1.62f;
 
@@ -36,11 +37,9 @@ int height = DEF_H;
 float playerX = 0;
 float playerY = 0;
 
-int fps = 0;
-
 GLuint blocks;
 
-BlockStates world[worldW * worldH * 2];
+BlockStates world[] = new[worldW * worldH * 2];
 
 bool isKeyDown(int key) {
     return glfwGetKey(window, key) == GLFW_PRESS;
@@ -70,6 +69,7 @@ void fbcb(Window window_, int width_, int height_) {
 }
 
 void close() {
+    delete[] world;
     if (blocks) {
         glDeleteTextures(1, &blocks);
     }
@@ -182,16 +182,17 @@ int init() {
 void render(double delta) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
-    glTranslatef((width >> 1) - playerX, (height >> 1) - playerY - playerH, 0);
+    glTranslatef((width >> 1) - playerX, (height >> 1) - playerY - BLOCK_RENDER_SIZE, 0);
     for (BlockStates states : world) {
-        renderBlock(states, blocks);
+        if (states.getBlock() != Blocks::AIR) {
+            renderBlock(states, blocks);
+        }
     }
     glPopMatrix();
     glfwSwapBuffers(window);
 }
 
 void tick(double delta) {
-    cerr << delta << endl;
     float step = PLAYER_STEP;
     if (isKeyDown(GLFW_KEY_W) || isKeyDown(GLFW_KEY_SPACE)) {
         playerY += step;
@@ -218,15 +219,11 @@ int WINAPI WinMain(
         return i;
     }
     glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
-    double last = glfwGetTime();
-    int frames = 0;
     while (!glfwWindowShouldClose(window)) {
-        double now = glfwGetTime();
-        double delta = now - last;
-        last = now;
-        tick(delta);
-        render(delta);
-        ++frames;
+        for (int i = 0; i < MAX_TPS; ++i) {
+            tick();
+        }
+        render();
         glfwPollEvents();
     }
     close();
