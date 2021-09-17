@@ -9,8 +9,8 @@
 #include "real2d/stb.h"
 #include "real2d/block.h"
 
-#define BLOCK(nm) (Block&)Blocks::nm
-#define WORLD_BLOCK(x,y,z) x + y * worldW + z * worldW * worldH
+#define BLOCK(nm) (Blocks::nm)
+#define WORLD_BLOCK(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
 
 using namespace Real2D;
 using std::cout;
@@ -25,8 +25,10 @@ constexpr float PLAYER_STEP = 0.02f;
 
 constexpr float playerH = 1.62f;
 
-constexpr int worldW = 16;
-constexpr int worldH = 16;
+constexpr int WORLD_W = 16;
+constexpr int WORLD_H = 16;
+constexpr int WORLD_D = 2;
+constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
 
 using Window = GLFWwindow*;
 Window window;
@@ -36,10 +38,10 @@ int height = DEF_H;
 
 float playerX = 0;
 float playerY = 0;
+float playerZ = 1;
 
 GLuint blocks;
-
-BlockStates world[] = new[worldW * worldH * 2];
+const Block** world = (const Block**)malloc(sizeof(const Block*) * WORLD_SIZE);
 
 bool isKeyDown(int key) {
     return glfwGetKey(window, key) == GLFW_PRESS;
@@ -69,8 +71,10 @@ void fbcb(Window window_, int width_, int height_) {
 }
 
 void close() {
-    delete[] world;
-    if (blocks) {
+    if (world) {
+        free(world);
+    }
+    if (blocks > 0) {
         glDeleteTextures(1, &blocks);
     }
     glfwSetKeyCallback(window, nullptr);
@@ -159,11 +163,18 @@ int init() {
 
     fbcb(window, DEF_W, DEF_H);
     glEnable(GL_TEXTURE_2D);
-    for (int z = 0; z < 2; ++z) {
-        for (int x = 0; x < 16; ++x) {
-            for (int y = 0; y < 16; ++y) {
+    for (int z = 0; z < WORLD_D; ++z) {
+        for (int x = 0; x < WORLD_W; ++x) {
+            for (int y = 0; y < WORLD_H; ++y) {
+                int p = WORLD_BLOCK(x, y, z);
                 if (y < 3) {
-                    world[WORLD_BLOCK(x, y, z)] = BlockStates(x, y, z, BLOCK(STONE));
+                    world[p] = BLOCK(STONE);
+                }
+                else if (y == 3) {
+                    world[p] = BLOCK(GRASS_BLOCK);
+                }
+                else {
+                    world[p] = BLOCK(AIR);
                 }
             }
         }
@@ -179,25 +190,46 @@ int init() {
     return 0;
 }
 
-void render(double delta) {
+void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_GREATER);
     glPushMatrix();
     glTranslatef((width >> 1) - playerX, (height >> 1) - playerY - BLOCK_RENDER_SIZE, 0);
-    for (BlockStates states : world) {
-        if (states.getBlock() != Blocks::AIR) {
-            renderBlock(states, blocks);
+    for (int z = 0; z < WORLD_D; ++z) {
+        for (int x = 0; x < WORLD_W; ++x) {
+            for (int y = 0; y < WORLD_H; ++y) {
+                int p = WORLD_BLOCK(x, y, z);
+                const Block* block = world[p];
+                if (block != Blocks::AIR) {
+                    renderBlock(x, y, z, block, blocks);
+                }
+            }
         }
     }
     glPopMatrix();
+    glDisable(GL_DEPTH_TEST);
     glfwSwapBuffers(window);
 }
 
-void tick(double delta) {
+void tick() {
     float step = PLAYER_STEP;
-    if (isKeyDown(GLFW_KEY_W) || isKeyDown(GLFW_KEY_SPACE)) {
+    if (isKeyDown(GLFW_KEY_W)) {
+        playerZ -= step;
+        if (playerZ < -1) {
+            playerZ = -1;
+        }
+    }
+    if (isKeyDown(GLFW_KEY_S)) {
+        playerZ += step;
+        if (playerZ > 1) {
+            playerZ = 1;
+        }
+    }
+    if (isKeyDown(GLFW_KEY_SPACE)) {
         playerY += step;
     }
-    if (isKeyDown(GLFW_KEY_S) || isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+    if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
         playerY -= step;
     }
     if (isKeyDown(GLFW_KEY_A)) {

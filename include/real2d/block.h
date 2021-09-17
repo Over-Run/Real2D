@@ -11,31 +11,36 @@ constexpr auto BLOCK_RENDER_SIZE = 32;
 namespace Real2D {
     class Block {
     private:
-        int id;
+        const int id;
     public:
-        Block(int id_);
+        Block(const int id_);
         Block(const Block&) = delete;
         Block operator=(const Block&) = delete;
-        int getId();
+        bool operator==(const Block&) const;
+        bool operator!=(const Block&) const;
+        const int getId() const;
     };
 
-    class BlockStates {
+    /*class BlockStates {
     private:
         int x, y, z;
-        Block& block;
+        const Block* block;
     public:
-        BlockStates(int x_, int y_, int z_, Block& block_);
+        BlockStates(int x_, int y_, int z_, const Block& block_);
         int getX();
         int getY();
         int getZ();
-        Block& getBlock();
-    };
+        const Block& getBlock();
+        void setBlock(const Block& block_);
+    };*/
 
     struct Blocks {
-        static const Block& AIR;
-        static const Block& GRASS_BLOCK;
-        static const Block& STONE;
+        static const Block* const AIR;
+        static const Block* const GRASS_BLOCK;
+        static const Block* const STONE;
+
+        ~Blocks();
     };
 
-    void renderBlock(BlockStates& states, GLuint texId);
+    void renderBlock(int x, int y, int z, const Block* block, GLuint texId);
 }
