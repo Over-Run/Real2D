@@ -1,5 +1,4 @@
 #pragma once
-
 #include "glad/gl.h"
 
 constexpr auto BLOCK_TEX_SIZE = 16;
@@ -18,6 +17,10 @@ namespace Real2D {
         Block operator=(const Block&) = delete;
         bool operator==(const Block&) const;
         bool operator!=(const Block&) const;
+        /// <summary>
+        /// Get this block's number id.
+        /// </summary>
+        /// <returns>The number id.</returns>
         const int getId() const;
     };
 
@@ -42,5 +45,12 @@ namespace Real2D {
         ~Blocks();
     };
 
-    void renderBlock(int x, int y, int z, const Block* block, GLuint texId);
+    /// <summary>
+    /// Render a block.
+    /// </summary>
+    /// <param name="x">Pos x.</param>
+    /// <param name="y">Pos y.</param>
+    /// <param name="z">Pos z.</param>
+    /// <param name="block">The block.</param>
+    void renderBlock(int x, int y, int z, const Block* block);
 }

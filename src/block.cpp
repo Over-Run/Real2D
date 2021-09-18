@@ -1,6 +1,6 @@
 #include "real2d/block.h"
 
-#define XLATE(axis) (GLfloat)(axis * BLOCK_RENDER_SIZE)
+#define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
 
 using namespace Real2D;
 
@@ -44,24 +44,22 @@ Blocks::~Blocks() {
     delete STONE;
 }
 
-void Real2D::renderBlock(int x, int y, int z, const Block* block, GLuint texId) {
+void Real2D::renderBlock(int x, int y, int z, const Block* block) {
     int id = block->getId();
     float u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
     float u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
     float v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
     float v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR;
-    glPushMatrix();
-    glTranslatef(XLATE(x), XLATE(y), XLATE(z));
-    glBindTexture(GL_TEXTURE_2D, texId);
-    glBegin(GL_QUADS);
+    int xi = XLATE(x);
+    int xi1 = XLATE(x + 1);
+    int yi = XLATE(y);
+    int yi1 = XLATE(y + 1);
+    int zi = XLATE(z);
     glColor3f(1, 1, 1);
-    glTexCoord2f(u0, v0); glVertex2f(0, BLOCK_RENDER_SIZE);
-    glTexCoord2f(u0, v1); glVertex2f(0, 0);
-    glTexCoord2f(u1, v1); glVertex2f(BLOCK_RENDER_SIZE, 0);
-    glTexCoord2f(u1, v0); glVertex2f(BLOCK_RENDER_SIZE, BLOCK_RENDER_SIZE);
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glPopMatrix();
+    glTexCoord2f(u0, v0); glVertex3i(xi, yi1, zi);
+    glTexCoord2f(u0, v1); glVertex3i(xi, yi, zi);
+    glTexCoord2f(u1, v1); glVertex3i(xi1, yi, zi);
+    glTexCoord2f(u1, v0); glVertex3i(xi1, yi1, zi);
 }
 
 #undef XLATE

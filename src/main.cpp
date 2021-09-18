@@ -8,6 +8,7 @@
 
 #include "real2d/stb.h"
 #include "real2d/block.h"
+#include "real2d/timer.h"
 
 #define BLOCK(nm) (Blocks::nm)
 #define WORLD_BLOCK(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
@@ -19,13 +20,14 @@ using std::endl;
 
 constexpr int DEF_W = 854;
 constexpr int DEF_H = 480;
-constexpr int MAX_TPS = 60;
 
-constexpr float PLAYER_STEP = 0.02f;
+// 2 pixels
+// (step / tps)
+constexpr float PLAYER_STEP = 0.03f;
 
 constexpr float playerH = 1.62f;
 
-constexpr int WORLD_W = 16;
+constexpr int WORLD_W = 32;
 constexpr int WORLD_H = 16;
 constexpr int WORLD_D = 2;
 constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
@@ -36,9 +38,11 @@ Window window;
 int width = DEF_W;
 int height = DEF_H;
 
-float playerX = 0;
-float playerY = 0;
+float playerX = 16;
+float playerY = 5;
 float playerZ = 1;
+
+Timer timer(60);
 
 GLuint blocks;
 const Block** world = (const Block**)malloc(sizeof(const Block*) * WORLD_SIZE);
@@ -65,7 +69,7 @@ void fbcb(Window window_, int width_, int height_) {
     glViewport(0, 0, width_, height_);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, width_, 0, height_, -1, 1);
+    glOrtho(0, width_, 0, height_, -100, 100);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -185,6 +189,7 @@ int init() {
         close();
         return i;
     }
+    timer.advanceTime();
 
     glfwShowWindow(window);
     return 0;
@@ -193,27 +198,33 @@ int init() {
 void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_GREATER);
+    glDepthFunc(GL_LEQUAL);
     glPushMatrix();
-    glTranslatef((width >> 1) - playerX, (height >> 1) - playerY - BLOCK_RENDER_SIZE, 0);
+    glTranslatef((width >> 1) - playerX * BLOCK_RENDER_SIZE,
+        (height >> 1) - (playerY + 1) * BLOCK_RENDER_SIZE,
+        0);
+    glBindTexture(GL_TEXTURE_2D, blocks);
+    glBegin(GL_QUADS);
     for (int z = 0; z < WORLD_D; ++z) {
         for (int x = 0; x < WORLD_W; ++x) {
             for (int y = 0; y < WORLD_H; ++y) {
                 int p = WORLD_BLOCK(x, y, z);
                 const Block* block = world[p];
                 if (block != Blocks::AIR) {
-                    renderBlock(x, y, z, block, blocks);
+                    renderBlock(x, y, z, block);
                 }
             }
         }
     }
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
     glPopMatrix();
     glDisable(GL_DEPTH_TEST);
     glfwSwapBuffers(window);
 }
 
-void tick() {
-    float step = PLAYER_STEP;
+void tick(double delta) {
+    float step = PLAYER_STEP * (float)delta;
     if (isKeyDown(GLFW_KEY_W)) {
         playerZ -= step;
         if (playerZ < -1) {
@@ -251,12 +262,22 @@ int WINAPI WinMain(
         return i;
     }
     glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
+    double lastTime = glfwGetTime();
+    int frames = 0;
     while (!glfwWindowShouldClose(window)) {
-        for (int i = 0; i < MAX_TPS; ++i) {
-            tick();
+        timer.advanceTime();
+        double delta = timer.delta;
+        for (int i = 0; i < timer.ticks; ++i) {
+            tick(delta);
         }
         render();
         glfwPollEvents();
+        ++frames;
+        while (glfwGetTime() >= lastTime + 1) {
+            timer.fps = frames;
+            lastTime += 1000L;
+            frames = 0;
+        }
     }
     close();
     return 0;
