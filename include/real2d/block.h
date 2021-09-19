@@ -1,11 +1,16 @@
 #pragma once
 #include "glad/gl.h"
 
+#define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
+
 constexpr auto BLOCK_TEX_SIZE = 16;
 constexpr auto BLOCKS_TEX_SIZE = 256;
 constexpr auto BLOCK_RENDER_SIZE = 32;
 #define BLOCKS_PER_TEX (BLOCKS_TEX_SIZE / BLOCK_TEX_SIZE)
 #define BLOCK_TEX_UV_FACTOR ((float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_SIZE)
+
+#define BLOCK(nm) (Blocks::nm)
+#define AIR_BLOCK BLOCK(AIR)
 
 namespace Real2D {
     class Block {
@@ -52,5 +57,9 @@ namespace Real2D {
     /// <param name="y">Pos y.</param>
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
-    void renderBlock(int x, int y, int z, const Block* block);
+    /// <param name="layer">The layer of rendering.
+    /// 0 of normal, 1 of dark, 2 of select.</param>
+    extern void renderBlock(int x, int y, int z, const Block* block, int layer);
 }
+
+using block_t = const Real2D::Block*;

@@ -1,6 +1,10 @@
 #include "real2d/block.h"
 
-#define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
+#define SET_UV int id = block->getId(); \
+float u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
+float u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
+float v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
+float v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR
 
 using namespace Real2D;
 
@@ -44,22 +48,32 @@ Blocks::~Blocks() {
     delete STONE;
 }
 
-void Real2D::renderBlock(int x, int y, int z, const Block* block) {
-    int id = block->getId();
-    float u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-    float u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-    float v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-    float v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR;
+void Real2D::renderBlock(int x, int y, int z, const Block* block, int layer) {
     int xi = XLATE(x);
     int xi1 = XLATE(x + 1);
     int yi = XLATE(y);
     int yi1 = XLATE(y + 1);
-    int zi = XLATE(z);
-    glColor3f(1, 1, 1);
-    glTexCoord2f(u0, v0); glVertex3i(xi, yi1, zi);
-    glTexCoord2f(u0, v1); glVertex3i(xi, yi, zi);
-    glTexCoord2f(u1, v1); glVertex3i(xi1, yi, zi);
-    glTexCoord2f(u1, v0); glVertex3i(xi1, yi1, zi);
+    if (layer == 0) {
+        SET_UV;
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(u0, v0); glVertex3i(xi, yi1, z);
+        glTexCoord2f(u0, v1); glVertex3i(xi, yi, z);
+        glTexCoord2f(u1, v1); glVertex3i(xi1, yi, z);
+        glTexCoord2f(u1, v0); glVertex3i(xi1, yi1, z);
+    }
+    else if (layer == 1) {
+        glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+        glVertex2i(xi, yi1);
+        glVertex2i(xi, yi);
+        glVertex2i(xi1, yi);
+        glVertex2i(xi1, yi1);
+    }
+    else if (layer == 2) {
+        SET_UV;
+        glColor4f(1.0f, 1.0f, 1.0f, 0.75f);
+        glTexCoord2f(u0, v0); glVertex3i(xi, yi1, z);
+        glTexCoord2f(u0, v1); glVertex3i(xi, yi, z);
+        glTexCoord2f(u1, v1); glVertex3i(xi1, yi, z);
+        glTexCoord2f(u1, v0); glVertex3i(xi1, yi1, z);
+    }
 }
-
-#undef XLATE
