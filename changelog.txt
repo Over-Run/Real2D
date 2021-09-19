@@ -1,3 +1,6 @@
+0.2.0
+New feature: main.cpp objective
+
 0.1.0
 The first version
 New feature: World
