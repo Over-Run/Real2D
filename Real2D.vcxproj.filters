@@ -27,6 +27,12 @@
     <ClCompile Include="src\timer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texmgr.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\stb.h">
@@ -36,6 +42,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\timer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\player.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\texmgr.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -55,6 +67,9 @@
       <Filter>Resources</Filter>
     </Image>
     <Image Include="res\block\blocks0.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\player.png">
       <Filter>Resources</Filter>
     </Image>
   </ItemGroup>

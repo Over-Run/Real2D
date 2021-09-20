@@ -1,5 +1,8 @@
 0.2.0
 New feature: main.cpp objective
+New feature: Compatible with Linux
+New feature: Render player
+New feature: Use scroll to choose block
 
 0.1.0
 The first version

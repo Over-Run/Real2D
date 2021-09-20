@@ -2,7 +2,7 @@
 
 #include "GLFW/glfw3.h"
 
-using namespace Real2D;
+using Real2D::Timer;
 
 Timer::Timer(double tps_) : tps(tps_) {
     lastTime = glfwGetTime() * NS_PER_SECOND;

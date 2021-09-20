@@ -1,5 +1,4 @@
 #pragma once
-#include "glad/gl.h"
 
 #define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
 
@@ -8,6 +7,9 @@ constexpr auto BLOCKS_TEX_SIZE = 256;
 constexpr auto BLOCK_RENDER_SIZE = 32;
 #define BLOCKS_PER_TEX (BLOCKS_TEX_SIZE / BLOCK_TEX_SIZE)
 #define BLOCK_TEX_UV_FACTOR ((float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_SIZE)
+
+#define X_OFFSET ((width >> 1) - player.x * BLOCK_RENDER_SIZE)
+#define Y_OFFSET ((height >> 1) - (player.y + 1) * BLOCK_RENDER_SIZE)
 
 #define BLOCK(nm) (Blocks::nm)
 #define AIR_BLOCK BLOCK(AIR)
