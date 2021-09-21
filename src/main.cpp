@@ -54,10 +54,10 @@ block_t choosingBlock = BLOCK(GRASS_BLOCK);
 
 int selectx = 0;
 int selecty = 0;
-float selectbx = 0;
-float selectbx1 = 0;
-float selectby = 0;
-float selectby1 = 0;
+GLfloat selectbx = 0;
+GLfloat selectbx1 = 0;
+GLfloat selectby = 0;
+GLfloat selectby1 = 0;
 block_t* selectblock0 = nullptr;
 block_t* selectblock1 = nullptr;
 
@@ -206,25 +206,31 @@ void selectWorld() {
     int mx = mouseX;
     int my = height - mouseY;
     bool selected = false;
+    const GLfloat xo = X_OFFSET;
+    const GLfloat yo = Y_OFFSET;
     for (int x = 0; x < WORLD_W; ++x) {
         for (int y = 0; y < WORLD_H; ++y) {
             block_t& block0 = world[WORLD_BLOCK(x, y, 0)];
             block_t& block1 = world[WORLD_BLOCK(x, y, 1)];
-            float bx = XLATE(x) + X_OFFSET;
-            float bx1 = bx + BLOCK_RENDER_SIZE;
-            float by = XLATE(y) + Y_OFFSET;
-            float by1 = by + BLOCK_RENDER_SIZE;
-            if (mx >= bx
-                && mx < bx1
-                && my >= by
-                && my < by1) {
+            GLfloat bx = (GLfloat)XLATE(x);
+            GLfloat bx1 = bx + BLOCK_RENDER_SIZE;
+            GLfloat by = (GLfloat)XLATE(y);
+            GLfloat by1 = by + BLOCK_RENDER_SIZE;
+            GLfloat obx = bx + xo;
+            GLfloat obx1 = bx1 + xo;
+            GLfloat oby = by + yo;
+            GLfloat oby1 = by1 + yo;
+            if (mx >= obx
+                && mx < obx1
+                && my >= oby
+                && my < oby1) {
                 selected = true;
                 selectx = x;
                 selectx = y;
-                selectbx = bx;
-                selectbx1 = bx1;
-                selectby = by;
-                selectby1 = by1;
+                selectbx = obx;
+                selectbx1 = obx1;
+                selectby = oby;
+                selectby1 = oby1;
                 selectblock0 = &block0;
                 selectblock1 = &block1;
                 if (block1 == AIR_BLOCK) {
@@ -364,9 +370,12 @@ void Real2D::Real2D::render() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    glPushMatrix();
+    glTranslatef(X_OFFSET, Y_OFFSET, 0);
     renderWorld();
     glDisable(GL_DEPTH_TEST);
     selectWorld();
+    glPopMatrix();
     glEnable(GL_DEPTH_TEST);
     player.render();
     glDisable(GL_DEPTH_TEST);

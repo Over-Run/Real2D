@@ -57,18 +57,10 @@ Blocks::~Blocks() {
 }
 
 void Real2D::renderBlock(int x, int y, int z, const Block* block, int layer) {
-    GLfloat xo = X_OFFSET;
-    GLfloat yo = Y_OFFSET;
-    GLfloat xi = XLATE(x) + xo;
-    GLfloat xi1 = XLATE(x + 1) + xo;
-    GLfloat yi = XLATE(y) + yo;
-    GLfloat yi1 = XLATE(y + 1) + yo;
-    if (xi1 < 0
-        || xi > width + 1
-        || yi1 < 0
-        || yi > height + 1) {
-        return;
-    }
+    GLfloat xi = (GLfloat)XLATE(x);
+    GLfloat xi1 = (GLfloat)XLATE(x + 1);
+    GLfloat yi = (GLfloat)XLATE(y);
+    GLfloat yi1 = (GLfloat)XLATE(y + 1);
     if (layer == 1) {
         glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
         glVertex2f(xi, yi1);
