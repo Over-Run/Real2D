@@ -78,7 +78,7 @@ void Real2D::renderBlock(int x, int y, int z, block_t block, int layer) {
         else if (layer == 2) {
             glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
         }
-        GLfloat fz = (GLfloat)z;
+        GLfloat fz = z * BLOCK_RENDER_SIZE;
         glTexCoord2f(u0, v0); glVertex3f(xi, yi1, fz);
         glTexCoord2f(u0, v1); glVertex3f(xi, yi, fz);
         glTexCoord2f(u1, v1); glVertex3f(xi1, yi, fz);
