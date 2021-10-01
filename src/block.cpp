@@ -47,20 +47,22 @@ void BlockStates::setBlock(const Block& block_) {
     block = &block_;
 }*/
 
-const Block* const Blocks::AIR = new Block(0);
-const Block* const Blocks::GRASS_BLOCK = new Block(1);
-const Block* const Blocks::STONE = new Block(2);
+block_t const Blocks::AIR = new Block(0);
+block_t const Blocks::GRASS_BLOCK = new Block(1);
+block_t const Blocks::STONE = new Block(2);
 Blocks::~Blocks() {
     delete AIR;
     delete GRASS_BLOCK;
     delete STONE;
 }
 
-void Real2D::renderBlock(int x, int y, int z, const Block* block, int layer) {
-    GLfloat xi = (GLfloat)XLATE(x);
-    GLfloat xi1 = (GLfloat)XLATE(x + 1);
-    GLfloat yi = (GLfloat)XLATE(y);
-    GLfloat yi1 = (GLfloat)XLATE(y + 1);
+void Real2D::renderBlock(int x, int y, int z, block_t block, int layer) {
+    GLfloat fx = (GLfloat)x;
+    GLfloat fy = (GLfloat)y;
+    GLfloat xi = XLATE(fx);
+    GLfloat xi1 = XLATE(fx + 1.0f);
+    GLfloat yi = XLATE(fy);
+    GLfloat yi1 = XLATE(fy + 1.0f);
     if (layer == 1) {
         glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
         glVertex2f(xi, yi1);

@@ -33,6 +33,9 @@
     <ClCompile Include="src\texmgr.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\world.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\stb.h">
@@ -48,6 +51,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\texmgr.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\world.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

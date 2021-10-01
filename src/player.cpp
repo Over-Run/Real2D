@@ -11,7 +11,7 @@ extern int width;
 extern int height;
 
 Player::Player() :
-    x(16), y(5), z(1), height(2), basestep(0.05f), rotate(1)
+    x(16.0f), y(5.0f), z(1.0f), height(2.0f), speed(0.05f), rotate(1)
 {}
 void Player::tick(double delta) {
     int xo = 0, yo = 0, zo = 0;
@@ -42,9 +42,9 @@ void Player::tick(double delta) {
         (float)(zo * delta));
 }
 void Player::moveRelative(float xom, float yom, float zom) {
-    x += basestep * xom;
-    y += basestep * yom;
-    z += basestep * zom;
+    x += speed * xom;
+    y += speed * yom;
+    z += speed * zom;
 
     // round (the earth is a ball)
     if (z < -1) {
@@ -177,8 +177,8 @@ void Player::render() {
     }
     else if (rotate == PLAYER_ROT_R) {
         // right leg
-        u0 = (4 + hf) / TEX_PLAYER_W;
-        u1 = (8 + hf) / TEX_PLAYER_W;
+        u0 = (0 + hf) / TEX_PLAYER_W;
+        u1 = (4 + hf) / TEX_PLAYER_W;
         glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
         glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
         glTexCoord2f(u1, v0); glVertex3f(4, vy, z);
@@ -188,8 +188,8 @@ void Player::render() {
         // left leg
         v0 = v4;
         v1 = v5;
-        u0 = (20 + hf) / TEX_PLAYER_W;
-        u1 = (24 + hf) / TEX_PLAYER_W;
+        u0 = (16 + hf) / TEX_PLAYER_W;
+        u1 = (20 + hf) / TEX_PLAYER_W;
         glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
         glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
         glTexCoord2f(u1, v0); glVertex3f(4, vy, z);

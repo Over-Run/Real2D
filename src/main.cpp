@@ -14,8 +14,7 @@
 #include "real2d/timer.h"
 #include "real2d/player.h"
 #include "real2d/texmgr.h"
-
-#define WORLD_BLOCK(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
+#include "real2d/world.h"
 
 constexpr int MBL = GLFW_MOUSE_BUTTON_LEFT;
 constexpr int MBM = GLFW_MOUSE_BUTTON_MIDDLE;
@@ -24,17 +23,13 @@ constexpr int MBR = GLFW_MOUSE_BUTTON_RIGHT;
 using Real2D::Block;
 using Real2D::Blocks;
 using Real2D::Timer;
+using Real2D::World;
 using std::cout;
 using std::cerr;
 using std::endl;
 
 constexpr int DEF_W = 854;
 constexpr int DEF_H = 480;
-
-constexpr int WORLD_W = 32;
-constexpr int WORLD_H = 16;
-constexpr int WORLD_D = 2;
-constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
 
 using Window = GLFWwindow*;
 Window window;
@@ -46,20 +41,9 @@ int mouseX = 0;
 int mouseY = 0;
 
 Timer timer(60);
+World world;
 
 GLuint blocks;
-block_t* world = (block_t*)malloc(sizeof(block_t) * WORLD_SIZE);
-
-block_t choosingBlock = BLOCK(GRASS_BLOCK);
-
-int selectx = 0;
-int selecty = 0;
-GLfloat selectbx = 0;
-GLfloat selectbx1 = 0;
-GLfloat selectby = 0;
-GLfloat selectby1 = 0;
-block_t* selectblock0 = nullptr;
-block_t* selectblock1 = nullptr;
 
 bool isKeyDown(int key) {
     return glfwGetKey(window, key) == GLFW_PRESS;
@@ -80,50 +64,33 @@ void keycb(Window window_, int key, int, int action, int) {
         if (key == GLFW_KEY_2) {
             choosingBlock = BLOCK(STONE);
         }
+        if (key == GLFW_KEY_Z) {
+            selectz = !selectz;
+        }
     }
 }
 
 void mbcb(Window window_, int button, int action, int) {
-    if (selectblock0 != nullptr
-        && selectblock1 != nullptr) {
-        if (*selectblock1 == AIR_BLOCK) {
-            if (*selectblock0 == AIR_BLOCK) {
-                if (choosingBlock != AIR_BLOCK) {
-                    if (action == GLFW_RELEASE
-                        && button == MBR) {
-                        *selectblock0 = choosingBlock;
-                    }
-                }
-                if (action == GLFW_RELEASE
-                    && button == MBM) {
-                    choosingBlock = AIR_BLOCK;
+    if (action == GLFW_RELEASE) {
+        if (selectblock != nullptr) {
+            block_t b = *selectblock;
+            if (b == AIR_BLOCK) {
+                if (button == MBR
+                    && choosingBlock != AIR_BLOCK) {
+                    *selectblock = choosingBlock;
                 }
             }
             else {
-                if (choosingBlock != AIR_BLOCK) {
-                    if (action == GLFW_RELEASE
-                        && button == MBR) {
-                        *selectblock1 = choosingBlock;
-                    }
+                if (button == MBL) {
+                    *selectblock = AIR_BLOCK;
                 }
-                if (action == GLFW_RELEASE
-                    && button == MBL) {
-                    *selectblock0 = AIR_BLOCK;
+                else if (button == MBM) {
+                    choosingBlock = b;
                 }
-                else if (action == GLFW_RELEASE
-                    && button == MBM) {
-                    choosingBlock = *selectblock0;
+                else if (button == MBR
+                    && choosingBlock != AIR_BLOCK) {
+                    *selectblock = choosingBlock;
                 }
-            }
-        }
-        else {
-            if (action == GLFW_RELEASE
-                && button == MBL) {
-                *selectblock1 = AIR_BLOCK;
-            }
-            else if (action == GLFW_RELEASE
-                && button == MBM) {
-                choosingBlock = *selectblock1;
             }
         }
     }
@@ -157,110 +124,7 @@ void fbcb(Window window_, int width_, int height_) {
 }
 
 void loadTexture() {
-    blocks = texmgr.loadTexture("res/block/blocks0.png");
-}
-
-void renderWorld() {
-    glBindTexture(GL_TEXTURE_2D, blocks);
-    glBegin(GL_QUADS);
-    for (int z = 0; z < WORLD_D; ++z) {
-        for (int x = 0; x < WORLD_W; ++x) {
-            for (int y = 0; y < WORLD_H; ++y) {
-                int p = WORLD_BLOCK(x, y, z);
-                block_t block = world[p];
-                if (block != AIR_BLOCK) {
-                    renderBlock(x, y, z, block, 0);
-                }
-            }
-        }
-    }
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBegin(GL_QUADS);
-    for (int x = 0; x < WORLD_W; ++x) {
-        for (int y = 0; y < WORLD_H; ++y) {
-            int p = WORLD_BLOCK(x, y, 0);
-            block_t block = world[p];
-            if (block != AIR_BLOCK) {
-                renderBlock(x, y, 0, block, 1);
-            }
-        }
-    }
-    glEnd();
-}
-
-void readyPutBlock(int x, int y, int z) {
-    glBindTexture(GL_TEXTURE_2D, blocks);
-    glBegin(GL_QUADS);
-    renderBlock(x, y, z, choosingBlock, 2);
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void readyDestroyBlock(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) {
-    glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
-    glRectf(x1, y1, x2, y2);
-}
-
-void selectWorld() {
-    int mx = mouseX;
-    int my = height - mouseY;
-    bool selected = false;
-    const GLfloat xo = X_OFFSET;
-    const GLfloat yo = Y_OFFSET;
-    for (int x = 0; x < WORLD_W; ++x) {
-        for (int y = 0; y < WORLD_H; ++y) {
-            block_t& block0 = world[WORLD_BLOCK(x, y, 0)];
-            block_t& block1 = world[WORLD_BLOCK(x, y, 1)];
-            GLfloat bx = (GLfloat)XLATE(x);
-            GLfloat bx1 = bx + BLOCK_RENDER_SIZE;
-            GLfloat by = (GLfloat)XLATE(y);
-            GLfloat by1 = by + BLOCK_RENDER_SIZE;
-            GLfloat obx = bx + xo;
-            GLfloat obx1 = bx1 + xo;
-            GLfloat oby = by + yo;
-            GLfloat oby1 = by1 + yo;
-            if (mx >= obx
-                && mx < obx1
-                && my >= oby
-                && my < oby1) {
-                selected = true;
-                selectx = x;
-                selectx = y;
-                selectbx = obx;
-                selectbx1 = obx1;
-                selectby = oby;
-                selectby1 = oby1;
-                selectblock0 = &block0;
-                selectblock1 = &block1;
-                if (block1 == AIR_BLOCK) {
-                    if (block0 == AIR_BLOCK) {
-                        if (choosingBlock != AIR_BLOCK) {
-                            readyPutBlock(x, y, 0);
-                        }
-                    }
-                    else {
-                        if (choosingBlock != AIR_BLOCK) {
-                            readyPutBlock(x, y, 1);
-                        }
-                        else {
-                            readyDestroyBlock(bx, by, bx1, by1);
-                        }
-                    }
-                }
-                else {
-                    readyDestroyBlock(bx, by, bx1, by1);
-                }
-                goto unloop;
-            }
-        }
-    }
-unloop:
-    // Check outside world
-    if (!selected) {
-        selectblock0 = nullptr;
-        selectblock1 = nullptr;
-    }
+    blocks = texmgr.loadTexture(TEX_BLOCKS);
 }
 
 namespace Real2D {
@@ -321,22 +185,7 @@ void Real2D::Real2D::start() {
     fbcb(window, DEF_W, DEF_H);
     glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
     glEnable(GL_TEXTURE_2D);
-    for (int z = 0; z < WORLD_D; ++z) {
-        for (int x = 0; x < WORLD_W; ++x) {
-            for (int y = 0; y < WORLD_H; ++y) {
-                int p = WORLD_BLOCK(x, y, z);
-                if (y < 3) {
-                    world[p] = BLOCK(STONE);
-                }
-                else if (y == 3) {
-                    world[p] = BLOCK(GRASS_BLOCK);
-                }
-                else {
-                    world[p] = AIR_BLOCK;
-                }
-            }
-        }
-    }
+    world.create();
 
     loadTexture();
     timer.advanceTime();
@@ -366,29 +215,13 @@ void Real2D::Real2D::run() {
 }
 void Real2D::Real2D::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glPushMatrix();
-    glTranslatef(X_OFFSET, Y_OFFSET, 0);
-    renderWorld();
-    glDisable(GL_DEPTH_TEST);
-    selectWorld();
-    glPopMatrix();
-    glEnable(GL_DEPTH_TEST);
-    player.render();
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
+    world.renderSelect();
     glfwSwapBuffers(window);
 }
 void Real2D::Real2D::tick(double delta) {
     player.tick(delta);
 }
 Real2D::Real2D::~Real2D() {
-    if (world) {
-        free(world);
-    }
     glfwSetKeyCallback(window, nullptr);
     glfwSetFramebufferSizeCallback(window, nullptr);
     glfwSetCursorPosCallback(window, nullptr);

@@ -2,14 +2,15 @@
 
 #define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
 
+constexpr const char* TEX_BLOCKS = "res/block/blocks0.png";
 constexpr auto BLOCK_TEX_SIZE = 16;
 constexpr auto BLOCKS_TEX_SIZE = 256;
-constexpr auto BLOCK_RENDER_SIZE = 32;
+constexpr auto BLOCK_RENDER_SIZE = 32.0f;
 #define BLOCKS_PER_TEX (BLOCKS_TEX_SIZE / BLOCK_TEX_SIZE)
 #define BLOCK_TEX_UV_FACTOR ((float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_SIZE)
 
-#define X_OFFSET ((width >> 1) - player.x * BLOCK_RENDER_SIZE)
-#define Y_OFFSET ((height >> 1) - (player.y + 1) * BLOCK_RENDER_SIZE)
+#define X_OFFSET ((width * 0.5f) - player.x * BLOCK_RENDER_SIZE)
+#define Y_OFFSET ((height * 0.5f) - (player.y + 1) * BLOCK_RENDER_SIZE)
 
 #define BLOCK(nm) (Blocks::nm)
 #define AIR_BLOCK BLOCK(AIR)
@@ -43,11 +44,15 @@ namespace Real2D {
         const Block& getBlock();
         void setBlock(const Block& block_);
     };*/
+}
 
+using block_t = const Real2D::Block*;
+
+namespace Real2D {
     struct Blocks {
-        static const Block* const AIR;
-        static const Block* const GRASS_BLOCK;
-        static const Block* const STONE;
+        static block_t const AIR;
+        static block_t const GRASS_BLOCK;
+        static block_t const STONE;
 
         ~Blocks();
     };
@@ -61,7 +66,5 @@ namespace Real2D {
     /// <param name="block">The block.</param>
     /// <param name="layer">The layer of rendering.
     /// 0 of normal, 1 of dark, 2 of select.</param>
-    extern void renderBlock(int x, int y, int z, const Block* block, int layer);
+    extern void renderBlock(int x, int y, int z, block_t block, int layer);
 }
-
-using block_t = const Real2D::Block*;

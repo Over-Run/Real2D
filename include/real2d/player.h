@@ -11,7 +11,7 @@ constexpr int PLAYER_ROT_B = 3;
 namespace Real2D {
     struct Player {
         const float height;
-        const float basestep;
+        const float speed;
         float x;
         float y;
         float z;

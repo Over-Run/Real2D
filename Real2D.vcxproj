@@ -177,6 +177,7 @@
     <ClCompile Include="src\stb.cpp" />
     <ClCompile Include="src\texmgr.cpp" />
     <ClCompile Include="src\timer.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\block.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="include\real2d\stb.h" />
     <ClInclude Include="include\real2d\texmgr.h" />
     <ClInclude Include="include\real2d\timer.h" />
+    <ClInclude Include="include\real2d\world.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\res.rc" />
