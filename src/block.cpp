@@ -48,7 +48,7 @@ void Real2D::renderBlock(int x, int y, int z, const Block* block) {
     int id = block->getId();
     float u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
     float u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-    float v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
+    float v0 = (id - 1) / BLOCKS_PER_TEX * BLOCK_TEX_UV_FACTOR;
     float v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR;
     int xi = XLATE(x);
     int xi1 = XLATE(x + 1);
