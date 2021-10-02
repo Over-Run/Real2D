@@ -1,8 +1,20 @@
 #include "real2d/block.h"
+#include "real2d/player.h"
+#include "glad/gl.h"
 
-#define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
+#define SET_UV int id = block->getId(); \
+GLfloat u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
+GLfloat u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
+GLfloat v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
+GLfloat v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR
 
-using namespace Real2D;
+using Real2D::Block;
+using Real2D::Blocks;
+using Real2D::Player;
+
+extern int width;
+extern int height;
+extern Player player;
 
 Block::Block(const int id_) : id(id_) {}
 const int Block::getId() const {
@@ -44,22 +56,38 @@ Blocks::~Blocks() {
     delete STONE;
 }
 
-void Real2D::renderBlock(int x, int y, int z, const Block* block) {
-    int id = block->getId();
-    float u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-    float u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-    float v0 = (id - 1) / BLOCKS_PER_TEX * BLOCK_TEX_UV_FACTOR;
-    float v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR;
-    int xi = XLATE(x);
-    int xi1 = XLATE(x + 1);
-    int yi = XLATE(y);
-    int yi1 = XLATE(y + 1);
-    int zi = XLATE(z);
-    glColor3f(1, 1, 1);
-    glTexCoord2f(u0, v0); glVertex3i(xi, yi1, zi);
-    glTexCoord2f(u0, v1); glVertex3i(xi, yi, zi);
-    glTexCoord2f(u1, v1); glVertex3i(xi1, yi, zi);
-    glTexCoord2f(u1, v0); glVertex3i(xi1, yi1, zi);
+void Real2D::renderBlock(int x, int y, int z, const Block* block, int layer) {
+    GLfloat xo = X_OFFSET;
+    GLfloat yo = Y_OFFSET;
+    GLfloat xi = XLATE(x) + xo;
+    GLfloat xi1 = XLATE(x + 1) + xo;
+    GLfloat yi = XLATE(y) + yo;
+    GLfloat yi1 = XLATE(y + 1) + yo;
+    if (xi1 < 0
+        || xi > width + 1
+        || yi1 < 0
+        || yi > height + 1) {
+        return;
+    }
+    if (layer == 1) {
+        glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+        glVertex2f(xi, yi1);
+        glVertex2f(xi, yi);
+        glVertex2f(xi1, yi);
+        glVertex2f(xi1, yi1);
+    }
+    else {
+        SET_UV;
+        if (layer == 0) {
+            glColor3f(1.0f, 1.0f, 1.0f);
+        }
+        else if (layer == 2) {
+            glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
+        }
+        GLfloat fz = (GLfloat)z;
+        glTexCoord2f(u0, v0); glVertex3f(xi, yi1, fz);
+        glTexCoord2f(u0, v1); glVertex3f(xi, yi, fz);
+        glTexCoord2f(u1, v1); glVertex3f(xi1, yi, fz);
+        glTexCoord2f(u1, v0); glVertex3f(xi1, yi1, fz);
+    }
 }
-
-#undef XLATE

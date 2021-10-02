@@ -2,23 +2,23 @@
 
 #include "GLFW/glfw3.h"
 
-using namespace Real2D;
+using Real2D::Timer;
 
 Timer::Timer(double tps_) : tps(tps_) {
-    lastTime = glfwGetTime();
+    lastTime = glfwGetTime() * NS_PER_SECOND;
 }
 void Timer::advanceTime() {
-    double now = glfwGetTime();
+    double now = glfwGetTime() * NS_PER_SECOND;;
     double passedNs = now - lastTime;
     lastTime = now;
     if (passedNs < 0) {
         passedNs = 0;
     }
-    else if (passedNs > NS_PER_SECOND) {
-        passedNs = NS_PER_SECOND;
+    else if (passedNs > MAX_NS_PER_UPDATE) {
+        passedNs = MAX_NS_PER_UPDATE;
     }
     lastFps = MAX_NS_PER_UPDATE / passedNs;
-    passedTime += passedNs * tps;
+    passedTime += passedNs * tps / NS_PER_SECOND;
     ticks = (int)passedTime;
     if (ticks > MAX_TICKS_PER_UPDATE) {
         ticks = MAX_TICKS_PER_UPDATE;

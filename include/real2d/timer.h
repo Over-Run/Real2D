@@ -1,7 +1,7 @@
 #pragma once
 
-constexpr auto NS_PER_SECOND = 1.0;
-constexpr auto MAX_NS_PER_UPDATE = 1.0;
+constexpr auto NS_PER_SECOND = 1000000000.0;
+constexpr auto MAX_NS_PER_UPDATE = 1000000000.0;
 constexpr auto MAX_TICKS_PER_UPDATE = 100;
 
 namespace Real2D {
