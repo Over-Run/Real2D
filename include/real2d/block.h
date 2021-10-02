@@ -3,16 +3,16 @@
 #define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
 
 constexpr const char* TEX_BLOCKS = "res/block/blocks0.png";
-constexpr auto BLOCK_TEX_SIZE = 16;
-constexpr auto BLOCKS_TEX_SIZE = 256;
+constexpr int BLOCK_TEX_SIZE = 16;
+constexpr int BLOCKS_TEX_SIZE = 256;
 constexpr auto BLOCK_RENDER_SIZE = 32.0f;
 #define BLOCKS_PER_TEX (BLOCKS_TEX_SIZE / BLOCK_TEX_SIZE)
 #define BLOCK_TEX_UV_FACTOR ((float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_SIZE)
 
-#define X_OFFSET ((width * 0.5f) - player.x * BLOCK_RENDER_SIZE)
-#define Y_OFFSET ((height * 0.5f) - (player.y + 1) * BLOCK_RENDER_SIZE)
+#define X_OFFSET ((Real2D::Window::width * 0.5f) - player.x * BLOCK_RENDER_SIZE)
+#define Y_OFFSET ((Real2D::Window::height * 0.5f) - (player.y + 1) * BLOCK_RENDER_SIZE)
 
-#define BLOCK(nm) (Blocks::nm)
+#define BLOCK(nm) (Real2D::Blocks::nm)
 #define AIR_BLOCK BLOCK(AIR)
 
 namespace Real2D {
@@ -26,9 +26,9 @@ namespace Real2D {
         bool operator==(const Block&) const;
         bool operator!=(const Block&) const;
         /// <summary>
-        /// Get this block's number id.
+        /// Get this block's raw id.
         /// </summary>
-        /// <returns>The number id.</returns>
+        /// <returns>The raw id.</returns>
         const int getId() const;
     };
 
@@ -64,7 +64,6 @@ namespace Real2D {
     /// <param name="y">Pos y.</param>
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
-    /// <param name="layer">The layer of rendering.
-    /// 0 of normal, 1 of dark, 2 of select.</param>
-    extern void renderBlock(int x, int y, int z, block_t block, int layer);
+    /// <param name="selecting">Selecting the block.</param>
+    extern void renderBlock(int, int, int, block_t, bool);
 }

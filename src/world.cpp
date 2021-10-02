@@ -1,16 +1,14 @@
 #include "real2d/texmgr.h"
 #include "real2d/player.h"
 #include "real2d/world.h"
+#include "real2d/window.h"
 #include <malloc.h>
 
+using Real2D::Window;
 using Real2D::Blocks;
 using Real2D::Player;
 using Real2D::World;
 
-extern int mouseX;
-extern int mouseY;
-extern int width;
-extern int height;
 extern Player player;
 
 block_t choosingBlock = BLOCK(GRASS_BLOCK);
@@ -58,47 +56,24 @@ void World::render() {
                 int p = WORLD_BLOCK(x, y, z);
                 block_t block = world[p];
                 if (block != AIR_BLOCK) {
-                    renderBlock(x, y, z, block, 0);
+                    renderBlock(x, y, z, block, false);
                 }
             }
         }
     }
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
-    glBegin(GL_QUADS);
-    for (int x = 0; x < WORLD_W; ++x) {
-        for (int y = 0; y < WORLD_H; ++y) {
-            int p = WORLD_BLOCK(x, y, 0);
-            block_t block = world[p];
-            if (block != AIR_BLOCK) {
-                renderBlock(x, y, 0, block, 1);
-            }
-        }
-    }
-    glEnd();
 }
 
-void readyPutBlock(int x, int y, int z) {
-    glBindTexture(GL_TEXTURE_2D, blocks);
-    glBegin(GL_QUADS);
-    renderBlock(x, y, z, choosingBlock, 2);
+void outline(int x, int y, int z) {
+    glBegin(GL_LINE_LOOP);
+    renderBlock(x, y, z, choosingBlock, true);
     glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBegin(GL_QUADS);
-    if (selectz == 0) {
-        renderBlock(x, y, z, choosingBlock, 1);
-    }
-    glEnd();
-}
-
-void readyDestroyBlock(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) {
-    glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
-    glRectf(x1, y1, x2, y2);
 }
 
 void World::select() {
-    int mx = mouseX;
-    int my = height - mouseY;
+    int mx = Window::mouseX;
+    int my = Window::height - Window::mouseY;
     bool selected = false;
     const GLfloat xo = X_OFFSET;
     const GLfloat yo = Y_OFFSET;
@@ -125,17 +100,7 @@ void World::select() {
                 selectby = oby;
                 selectby1 = oby1;
                 selectblock = &block;
-                if (block == AIR_BLOCK) {
-                    if (choosingBlock != AIR_BLOCK) {
-                        readyPutBlock(x, y, selectz);
-                    }
-                    else {
-                        readyDestroyBlock(bx, by, bx1, by1);
-                    }
-                }
-                else {
-                    readyDestroyBlock(bx, by, bx1, by1);
-                }
+                outline(x, y, selectz);
                 goto unloop;
             }
         }

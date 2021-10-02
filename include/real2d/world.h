@@ -33,6 +33,3 @@ namespace Real2D {
         void renderSelect();
     };
 }
-
-extern void readyPutBlock(int x, int y, int z);
-extern void readyDestroyBlock(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2);

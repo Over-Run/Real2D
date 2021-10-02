@@ -2,12 +2,6 @@
 #include "real2d/player.h"
 #include "glad/gl.h"
 
-#define SET_UV int id = block->getId(); \
-GLfloat u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
-GLfloat u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
-GLfloat v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
-GLfloat v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR
-
 using Real2D::Block;
 using Real2D::Blocks;
 using Real2D::Player;
@@ -56,29 +50,28 @@ Blocks::~Blocks() {
     delete STONE;
 }
 
-void Real2D::renderBlock(int x, int y, int z, block_t block, int layer) {
+void Real2D::renderBlock(int x, int y, int z, block_t block, bool selecting) {
     GLfloat fx = (GLfloat)x;
     GLfloat fy = (GLfloat)y;
+    GLfloat fz = z * BLOCK_RENDER_SIZE;
     GLfloat xi = XLATE(fx);
     GLfloat xi1 = XLATE(fx + 1.0f);
     GLfloat yi = XLATE(fy);
     GLfloat yi1 = XLATE(fy + 1.0f);
-    if (layer == 1) {
-        glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-        glVertex2f(xi, yi1);
-        glVertex2f(xi, yi);
-        glVertex2f(xi1, yi);
-        glVertex2f(xi1, yi1);
+    if (selecting) {
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(xi, yi1 - 1, fz);
+        glVertex3f(xi + 1, yi, fz);
+        glVertex3f(xi1, yi, fz);
+        glVertex3f(xi1, yi1 - 1, fz);
     }
     else {
-        SET_UV;
-        if (layer == 0) {
-            glColor3f(1.0f, 1.0f, 1.0f);
-        }
-        else if (layer == 2) {
-            glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
-        }
-        GLfloat fz = z * BLOCK_RENDER_SIZE;
+        int id = block->getId();
+        GLfloat u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
+        GLfloat u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
+        GLfloat v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
+        GLfloat v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR;
+        glColor3f(1.0f, 1.0f, 1.0f);
         glTexCoord2f(u0, v0); glVertex3f(xi, yi1, fz);
         glTexCoord2f(u0, v1); glVertex3f(xi, yi, fz);
         glTexCoord2f(u1, v1); glVertex3f(xi1, yi, fz);

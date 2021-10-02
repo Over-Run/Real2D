@@ -39,6 +39,12 @@
     <ClCompile Include="src\rmath.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\window.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\stb.h">
@@ -60,6 +66,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\rmath.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\window.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\client.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

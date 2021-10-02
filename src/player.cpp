@@ -1,20 +1,19 @@
 #include "real2d/player.h"
 #include "real2d/texmgr.h"
 #include "GLFW/glfw3.h"
-#include "real2d/rmath.h"
+#include "real2d/window.h"
 
 using Real2D::Player;
+using Real2D::Window;
 
 Player player;
 
-extern bool isKeyDown(int key);
-extern int width;
-extern int height;
-extern int mouseX;
-extern int mouseY;
-
 float headXRot = 0.0f;
 float yRot = 0.0f;
+
+inline bool isKeyDown(int key) {
+    return Window::isKeyDown(key);
+}
 
 Player::Player() :
     x(16.0f), y(5.0f), z(1.0f), height(2.0f), speed(0.05f)
@@ -42,8 +41,8 @@ void Player::tick(double delta) {
     moveRelative((float)(xo * delta),
         (float)(yo * delta),
         (float)(zo * delta));
-    headXRot = mouseY - ::height * 0.5f;
-    yRot = mouseX - width * 0.5f;
+    headXRot = Window::mouseY - Window::height * 0.5f;
+    yRot = Window::mouseX - Window::width * 0.5f;
     if (headXRot < -45) {
         headXRot = -45;
     }
@@ -72,7 +71,7 @@ void Player::moveRelative(float xom, float yom, float zom) {
 }
 void Player::render() {
     glPushMatrix();
-    glTranslatef(width * 0.5f, ::height * 0.5f, 0);
+    glTranslatef(Window::width * 0.5f, Window::height * 0.5f, 0);
     GLuint id = texmgr.loadTexture(TEX_PLAYER);
 
     const GLfloat u0 = 0;
