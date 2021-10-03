@@ -171,8 +171,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\aabb.cpp" />
     <ClCompile Include="src\block.cpp" />
     <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\hit.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\rmath.cpp" />
@@ -183,8 +185,10 @@
     <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\real2d\aabb.h" />
     <ClInclude Include="include\real2d\block.h" />
     <ClInclude Include="include\real2d\client.h" />
+    <ClInclude Include="include\real2d\hit.h" />
     <ClInclude Include="include\real2d\player.h" />
     <ClInclude Include="include\real2d\rmath.h" />
     <ClInclude Include="include\real2d\stb.h" />

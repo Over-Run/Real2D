@@ -10,6 +10,7 @@
 
 using Real2D::Timer;
 using Real2D::World;
+using Real2D::Client;
 
 window_t window;
 
@@ -22,7 +23,7 @@ void loadTexture() {
     blocks = texmgr.loadTexture(TEX_BLOCKS);
 }
 
-void Real2D::Real2D::start() {
+void Client::start() {
     glfwSetErrorCallback(Window::errcb);
     if (!glfwInit()) {
         throw "Unable to initialize GLFW";
@@ -83,7 +84,7 @@ void Real2D::Real2D::start() {
 
     run();
 }
-void Real2D::Real2D::run() {
+void Client::run() {
     double lastTime = glfwGetTime() * 1000;
     int frames = 0;
     while (!glfwWindowShouldClose(window)) {
@@ -102,15 +103,15 @@ void Real2D::Real2D::run() {
         }
     }
 }
-void Real2D::Real2D::render() {
+void Client::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     world.renderSelect();
     glfwSwapBuffers(window);
 }
-void Real2D::Real2D::tick(double delta) {
+void Client::tick(double delta) {
     player.tick(delta);
 }
-Real2D::Real2D::~Real2D() {
+Client::~Client() {
     glfwSetKeyCallback(window, nullptr);
     glfwSetFramebufferSizeCallback(window, nullptr);
     glfwSetCursorPosCallback(window, nullptr);

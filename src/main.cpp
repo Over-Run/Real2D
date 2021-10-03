@@ -5,9 +5,11 @@
 
 #include "real2d/client.h"
 
+using Real2D::Client;
+
 int main() {
-    Real2D::Real2D real2d;
-    real2d.start();
+    Client client;
+    client.start();
     return 0;
 }
 

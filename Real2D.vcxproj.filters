@@ -45,6 +45,12 @@
     <ClCompile Include="src\client.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\aabb.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hit.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\stb.h">
@@ -72,6 +78,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\client.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\aabb.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\hit.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

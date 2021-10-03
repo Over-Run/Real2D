@@ -1,4 +1,5 @@
 #pragma once
+#include "aabb.h"
 
 constexpr const char* TEX_PLAYER = "res/player.png";
 constexpr float TEX_PLAYER_W = 48.0f;
@@ -11,6 +12,7 @@ namespace Real2D {
     struct Player {
         const float height;
         const float speed;
+        Real2D::AABBox* bb;
         float x;
         float y;
         float z;

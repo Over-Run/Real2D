@@ -2,8 +2,6 @@
 #include "glad/gl.h"
 #include "real2d/block.h"
 
-#define WORLD_BLOCK(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
-
 constexpr int WORLD_W = 48;
 constexpr int WORLD_H = 32;
 constexpr int WORLD_D = 2;
@@ -11,14 +9,7 @@ constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
 
 extern block_t choosingBlock;
 
-extern int selectx;
-extern int selecty;
 extern int selectz;
-extern GLfloat selectbx;
-extern GLfloat selectbx1;
-extern GLfloat selectby;
-extern GLfloat selectby1;
-extern block_t* selectblock;
 
 namespace Real2D {
     class World {
@@ -34,5 +25,7 @@ namespace Real2D {
         void renderSelect();
         void markDirty();
         bool isDirty();
+        block_t& getBlock(int x, int y, int z);
+        void setBlock(int x, int y, int z, block_t block);
     };
 }

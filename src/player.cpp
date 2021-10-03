@@ -5,6 +5,7 @@
 
 using Real2D::Player;
 using Real2D::Window;
+using Real2D::AABBox;
 
 Player player;
 
@@ -19,7 +20,7 @@ inline bool isKeyDown(int key) {
 }
 
 Player::Player() :
-    x(16.0f), y(5.0f), z(1.0f), height(2.0f), speed(0.05f)
+    x(16.0f), y(5.0f), z(1.0f), height(2.0f), speed(1.0f / 60.0f), bb(new AABBox(0, 0, 0, 24, 64, 16))
 {}
 void Player::tick(double delta) {
     int xo = 0, yo = 0, zo = 0;

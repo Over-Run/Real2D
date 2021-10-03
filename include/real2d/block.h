@@ -1,4 +1,5 @@
 #pragma once
+#include "aabb.h"
 
 #define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
 
@@ -24,7 +25,7 @@ namespace Real2D {
     private:
         const int id;
     public:
-        Block(const int id_);
+        Block(const int _id);
         Block(const Block&) = delete;
         Block operator=(const Block&) = delete;
         bool operator==(const Block&) const;
@@ -33,7 +34,9 @@ namespace Real2D {
         /// Get this block's raw id.
         /// </summary>
         /// <returns>The raw id.</returns>
-        const int getId() const;
+        int getId();
+        AABBox getOutline();
+        AABBox getCollision();
     };
 
     /*class BlockStates {
@@ -50,13 +53,13 @@ namespace Real2D {
     };*/
 }
 
-using block_t = const Real2D::Block*;
+using block_t = Real2D::Block*;
 
 namespace Real2D {
     struct Blocks {
-        static block_t const AIR;
-        static block_t const GRASS_BLOCK;
-        static block_t const STONE;
+        static block_t AIR;
+        static block_t GRASS_BLOCK;
+        static block_t STONE;
 
         ~Blocks();
     };
@@ -68,6 +71,5 @@ namespace Real2D {
     /// <param name="y">Pos y.</param>
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
-    /// <param name="selecting">Selecting the block.</param>
-    extern void renderBlock(int, int, int, block_t, bool);
+    extern void renderBlock(int, int, int, block_t);
 }
