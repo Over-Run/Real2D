@@ -8,7 +8,7 @@ Timer::Timer(double tps_) : tps(tps_) {
     lastTime = glfwGetTime() * NS_PER_SECOND;
 }
 void Timer::advanceTime() {
-    double now = glfwGetTime() * NS_PER_SECOND;;
+    double now = glfwGetTime() * NS_PER_SECOND;
     double passedNs = now - lastTime;
     lastTime = now;
     if (passedNs < 0) {

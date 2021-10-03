@@ -11,8 +11,6 @@
 using Real2D::Timer;
 using Real2D::World;
 
-const GLfloat lightPosition[] = { 0.0f, -1.0f, 1.0f, 0.0f };
-
 window_t window;
 
 Timer timer(60);
@@ -30,7 +28,13 @@ void Real2D::Real2D::start() {
         throw "Unable to initialize GLFW";
     }
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    window = glfwCreateWindow(DEF_W, DEF_H, "Real2D", nullptr, nullptr);
+    char c[20] = "Real2D ";
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    strcat_s(c, 20, GAME_VER);
+#else
+    strcat(c, GAME_VER);
+#endif
+    window = glfwCreateWindow(DEF_W, DEF_H, c, nullptr, nullptr);
     if (window == nullptr) {
         glfwTerminate();
         throw "Unable to create GLFW window";
@@ -39,7 +43,6 @@ void Real2D::Real2D::start() {
     glfwSetKeyCallback(window, Window::keycb);
     glfwSetFramebufferSizeCallback(window, Window::fbcb);
     glfwSetCursorPosCallback(window, Window::cpcb);
-    glfwSetMouseButtonCallback(window, Window::mbcb);
     glfwSetScrollCallback(window, Window::sccb);
 
     const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -49,17 +52,16 @@ void Real2D::Real2D::start() {
             (vidmode->height - Window::height) >> 1);
     }
 
+    GLFWimage img[3];
     int w = 0;
     int h = 0;
     int comp = 0;
-    stbi_uc* icon16 = stbi_load_out("res/icon16.png", &w, &h, &comp, STBI_rgb_alpha);
-    stbi_uc* icon32 = stbi_load_out("res/icon32.png", &w, &h, &comp, STBI_rgb_alpha);
-    stbi_uc* icon48 = stbi_load_out("res/icon48.png", &w, &h, &comp, STBI_rgb_alpha);
-    GLFWimage img[] = {
-        { 16, 16, icon16 },
-        { 32, 32, icon32 },
-        { 48, 48, icon48 }
-    };
+    auto icon16 = stbi_load_out("res/icon16.png", &w, &h, &comp, STBI_rgb_alpha);
+    img[0] = { w, h, icon16 };
+    auto icon32 = stbi_load_out("res/icon32.png", &w, &h, &comp, STBI_rgb_alpha);
+    img[1] = { w, h, icon32 };
+    auto icon48 = stbi_load_out("res/icon48.png", &w, &h, &comp, STBI_rgb_alpha);
+    img[2] = { w, h, icon48 };
     glfwSetWindowIcon(window, 3, img);
     stbi_image_free(icon16);
     stbi_image_free(icon32);
@@ -112,7 +114,6 @@ Real2D::Real2D::~Real2D() {
     glfwSetKeyCallback(window, nullptr);
     glfwSetFramebufferSizeCallback(window, nullptr);
     glfwSetCursorPosCallback(window, nullptr);
-    glfwSetMouseButtonCallback(window, nullptr);
     glfwSetScrollCallback(window, nullptr);
     glfwDestroyWindow(window);
     glfwTerminate();

@@ -5,12 +5,16 @@
 constexpr const char* TEX_BLOCKS = "res/block/blocks0.png";
 constexpr int BLOCK_TEX_SIZE = 16;
 constexpr int BLOCKS_TEX_SIZE = 256;
-constexpr auto BLOCK_RENDER_SIZE = 32.0f;
+constexpr int BLOCK_RENDER_SIZE = 32;
 #define BLOCKS_PER_TEX (BLOCKS_TEX_SIZE / BLOCK_TEX_SIZE)
 #define BLOCK_TEX_UV_FACTOR ((float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_SIZE)
+#define BLOCK_TEX_U0(id) ((((id) - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR);
+#define BLOCK_TEX_U1(id) (((id) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR);
+#define BLOCK_TEX_V0(id) ((((id) - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR);
+#define BLOCK_TEX_V1(id) ((((id) / BLOCKS_PER_TEX) + 1) * BLOCK_TEX_UV_FACTOR);
 
-#define X_OFFSET ((Real2D::Window::width * 0.5f) - player.x * BLOCK_RENDER_SIZE)
-#define Y_OFFSET ((Real2D::Window::height * 0.5f) - (player.y + 1) * BLOCK_RENDER_SIZE)
+#define X_OFFSET (GLfloat)(int)((Real2D::Window::width * 0.5f) - (int)(player.x * BLOCK_RENDER_SIZE))
+#define Y_OFFSET (GLfloat)(int)((Real2D::Window::height * 0.5f) - (int)((player.y + 1) * BLOCK_RENDER_SIZE))
 
 #define BLOCK(nm) (Real2D::Blocks::nm)
 #define AIR_BLOCK BLOCK(AIR)

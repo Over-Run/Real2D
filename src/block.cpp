@@ -49,32 +49,36 @@ Blocks::~Blocks() {
     delete GRASS_BLOCK;
     delete STONE;
 }
-
 void Real2D::renderBlock(int x, int y, int z, block_t block, bool selecting) {
-    GLfloat fx = (GLfloat)x;
-    GLfloat fy = (GLfloat)y;
-    GLfloat fz = z * BLOCK_RENDER_SIZE;
-    GLfloat xi = XLATE(fx);
-    GLfloat xi1 = XLATE(fx + 1.0f);
-    GLfloat yi = XLATE(fy);
-    GLfloat yi1 = XLATE(fy + 1.0f);
+    GLfloat xi = (GLfloat)XLATE(x);
+    GLfloat xi1 = (GLfloat)XLATE(x + 1);
+    GLfloat yi = (GLfloat)XLATE(y);
+    GLfloat yi1 = (GLfloat)XLATE(y + 1);
+    GLfloat zi = (GLfloat)XLATE(z);
+    int id = block->getId();
+    GLfloat u0 = BLOCK_TEX_U0(id);
+    GLfloat u1 = BLOCK_TEX_U1(id);
+    GLfloat v0 = BLOCK_TEX_V0(id);
+    GLfloat v1 = BLOCK_TEX_V1(id);
     if (selecting) {
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(xi, yi1 - 1, fz);
-        glVertex3f(xi + 1, yi, fz);
-        glVertex3f(xi1, yi, fz);
-        glVertex3f(xi1, yi1 - 1, fz);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.9f);
+        glVertex3f(xi + 1, yi1, zi);
+        glVertex3f(xi + 1, yi, zi);
+        glVertex3f(xi1, yi, zi);
+        glVertex3f(xi1, yi1 - 1, zi);
     }
     else {
-        int id = block->getId();
-        GLfloat u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-        GLfloat u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-        GLfloat v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR;
-        GLfloat v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR;
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTexCoord2f(u0, v0); glVertex3f(xi, yi1, fz);
-        glTexCoord2f(u0, v1); glVertex3f(xi, yi, fz);
-        glTexCoord2f(u1, v1); glVertex3f(xi1, yi, fz);
-        glTexCoord2f(u1, v0); glVertex3f(xi1, yi1, fz);
+        GLfloat color;
+        if (z == 0) {
+            color = 0.5f;
+        }
+        else {
+            color = 1.0f;
+        }
+        glColor3f(color, color, color);
+        glTexCoord2f(u0, v0); glVertex3f(xi, yi1, zi);
+        glTexCoord2f(u0, v1); glVertex3f(xi, yi, zi);
+        glTexCoord2f(u1, v1); glVertex3f(xi1, yi, zi);
+        glTexCoord2f(u1, v0); glVertex3f(xi1, yi1, zi);
     }
 }

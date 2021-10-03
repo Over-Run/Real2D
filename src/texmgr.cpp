@@ -25,7 +25,7 @@ GLuint TexMgr::loadTexture(string img) {
 #endif
     stbi_uc* tex = stbi_load_out(c, &w, &h, &comp, STBI_rgb_alpha);
     glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
+    bindTexture(id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,
@@ -42,4 +42,10 @@ GLuint TexMgr::loadTexture(string img) {
     idmap[img] = id;
     delete[] c;
     return id;
+}
+void TexMgr::bindTexture(GLuint id) {
+    if (lastId != id) {
+        glBindTexture(GL_TEXTURE_2D, id);
+        lastId = id;
+    }
 }

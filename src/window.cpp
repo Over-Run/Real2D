@@ -38,32 +38,6 @@ void Window::keycb(window_t window_, int key, int, int action, int) {
     }
 }
 
-void Window::mbcb(window_t window_, int button, int action, int) {
-    if (action == GLFW_RELEASE) {
-        if (selectblock != nullptr) {
-            block_t b = *selectblock;
-            if (b == AIR_BLOCK) {
-                if (button == MBR
-                    && choosingBlock != AIR_BLOCK) {
-                    *selectblock = choosingBlock;
-                }
-            }
-            else {
-                if (button == MBL) {
-                    *selectblock = AIR_BLOCK;
-                }
-                else if (button == MBM) {
-                    choosingBlock = b;
-                }
-                else if (button == MBR
-                    && choosingBlock != AIR_BLOCK) {
-                    *selectblock = choosingBlock;
-                }
-            }
-        }
-    }
-}
-
 void Window::sccb(window_t window_, double xoffset, double yoffset) {
     if (yoffset) {
         if (choosingBlock == BLOCK(GRASS_BLOCK)) {

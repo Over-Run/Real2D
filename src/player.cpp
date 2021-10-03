@@ -1,7 +1,7 @@
 #include "real2d/player.h"
 #include "real2d/texmgr.h"
-#include "GLFW/glfw3.h"
 #include "real2d/window.h"
+#include "real2d/block.h"
 
 using Real2D::Player;
 using Real2D::Window;
@@ -10,6 +10,9 @@ Player player;
 
 float headXRot = 0.0f;
 float yRot = 0.0f;
+
+extern GLuint blocks;
+extern block_t choosingBlock;
 
 inline bool isKeyDown(int key) {
     return Window::isKeyDown(key);
@@ -93,7 +96,7 @@ void Player::render() {
     const GLfloat v52 = 52 / TEX_PLAYER_H;
 
     glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, id);
+    texmgr.bindTexture(id);
     // Head
     glPushMatrix();
     glTranslatef(0, -16, -8);
@@ -243,7 +246,28 @@ void Player::render() {
     glEnd();
     glPopMatrix();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    texmgr.bindTexture(0);
+
+    // handled block
+    const int bid = choosingBlock->getId();
+    const GLfloat bu0 = BLOCK_TEX_U0(bid);
+    const GLfloat bv0 = BLOCK_TEX_V0(bid);
+    const GLfloat bu1 = BLOCK_TEX_U1(bid);
+    const GLfloat bv1 = BLOCK_TEX_V1(bid);
+    const GLfloat bts = (GLfloat)BLOCK_TEX_SIZE;
+    const GLfloat hbts = (GLfloat)BLOCK_TEX_SIZE * 0.5f;
+    texmgr.bindTexture(blocks);
+    glPushMatrix();
+    glTranslatef(0, -16, 0);
+    glRotatef(yRot, 0, 1, 0);
+    glBegin(GL_QUADS);
+    glTexCoord2f(bu0, bv0); glVertex3f(-12 - hbts, -24, 5);
+    glTexCoord2f(bu0, bv1); glVertex3f(-12 - hbts, (-bts) - 24, 5);
+    glTexCoord2f(bu1, bv1); glVertex3f(-12 + hbts, (-bts) - 24, 5);
+    glTexCoord2f(bu1, bv0); glVertex3f(-12 + hbts, -24, 5);
+    glEnd();
+    glPopMatrix();
+    texmgr.bindTexture(0);
 
     glPopMatrix();
 }

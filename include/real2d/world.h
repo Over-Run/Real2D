@@ -4,8 +4,8 @@
 
 #define WORLD_BLOCK(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
 
-constexpr int WORLD_W = 32;
-constexpr int WORLD_H = 16;
+constexpr int WORLD_W = 48;
+constexpr int WORLD_H = 32;
 constexpr int WORLD_D = 2;
 constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
 
@@ -24,6 +24,7 @@ namespace Real2D {
     class World {
     public:
         block_t* world;
+        bool is_dirty;
 
         World();
         ~World();
@@ -31,5 +32,7 @@ namespace Real2D {
         void render();
         void select();
         void renderSelect();
+        void markDirty();
+        bool isDirty();
     };
 }

@@ -23,7 +23,6 @@ namespace Real2D {
         static bool isKeyDown(int);
         static void errcb(int, const char*);
         static void keycb(window_t, int, int, int, int);
-        static void mbcb(window_t, int, int, int);
         static void sccb(window_t, double, double);
         static void cpcb(window_t, double, double);
         static void fbcb(window_t, int, int);
