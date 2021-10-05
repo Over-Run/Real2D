@@ -1,13 +1,9 @@
 #pragma once
 #include "glad/gl.h"
-#include "real2d/block.h"
+#include "block.h"
+#include <vector>
 
-constexpr int WORLD_W = 48;
-constexpr int WORLD_H = 32;
-constexpr int WORLD_D = 2;
-constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
-
-extern block_t choosingBlock;
+extern Real2D::block_t choosingBlock;
 
 extern int selectz;
 
@@ -20,9 +16,11 @@ namespace Real2D {
         World();
         ~World();
         void create();
-        void render();
+        void render(double delta);
         void select();
-        void renderSelect();
+        void renderSelect(double delta);
+        void tick();
+        std::vector<AABBox> getCubes(AABBox box);
         void markDirty();
         bool isDirty();
         block_t& getBlock(int x, int y, int z);

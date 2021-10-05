@@ -3,13 +3,10 @@
 #include "glad/gl.h"
 
 using Real2D::Block;
+using Real2D::AirBlock;
+using Real2D::block_t;
 using Real2D::Blocks;
-using Real2D::Player;
 using Real2D::AABBox;
-
-extern int width;
-extern int height;
-extern Player player;
 
 Block::Block(const int _id) : id(_id) {}
 int Block::getId() {
@@ -21,11 +18,15 @@ bool Block::operator==(const Block& block_) const {
 bool Block::operator!=(const Block& block_) const {
     return id != block_.id;
 }
-AABBox Block::getOutline() {
-    return AABBox::FULL_CUBE;
+AABBox* Block::getOutline() {
+    return (AABBox*)&AABBox::FULL_CUBE;
 }
-AABBox Block::getCollision() {
-    return AABBox::FULL_CUBE;
+AABBox* Block::getCollision() {
+    return getOutline();
+}
+
+AABBox* AirBlock::getCollision() {
+    return nullptr;
 }
 
 /*BlockStates::BlockStates(int x_, int y_, int z_, const Block& block_) :
@@ -57,11 +58,11 @@ Blocks::~Blocks() {
     delete STONE;
 }
 void Real2D::renderBlock(int x, int y, int z, block_t block) {
-    GLfloat xi = (GLfloat)XLATE(x);
-    GLfloat xi1 = (GLfloat)XLATE(x + 1);
-    GLfloat yi = (GLfloat)XLATE(y);
-    GLfloat yi1 = (GLfloat)XLATE(y + 1);
-    GLfloat zi = (GLfloat)XLATE(z);
+    GLfloat xi = (GLfloat)UNML(x);
+    GLfloat xi1 = (GLfloat)UNML(x + 1);
+    GLfloat yi = (GLfloat)UNML(y);
+    GLfloat yi1 = (GLfloat)UNML(y + 1);
+    GLfloat zi = (GLfloat)UNML(z);
     int id = block->getId();
     GLfloat u0 = BLOCK_TEX_U0(id);
     GLfloat u1 = BLOCK_TEX_U1(id);

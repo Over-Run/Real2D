@@ -7,20 +7,46 @@
 #include "real2d/world.h"
 #include "real2d/player.h"
 #include "real2d/texmgr.h"
+#include <cstdarg>
+#include <cstdlib>
 
+using std::va_list;
 using Real2D::Timer;
 using Real2D::World;
+using Real2D::Player;
 using Real2D::Client;
 
 window_t window;
 
 Timer timer(60);
-World world;
+World* world;
+Player* player;
 
 GLuint blocks;
 
 void loadTexture() {
     blocks = texmgr.loadTexture(TEX_BLOCKS);
+}
+
+const char* appendTitle(int count, ...) {
+    char* c = new char[80]{ "Real2D " };
+    va_list valist;
+    va_start(valist, count);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    strcat_s(c, 80, GAME_VER);
+#else
+    strcat(c, GAME_VER);
+#endif
+    for (int i = 0; i < count; ++i) {
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+        strcat_s(c, 80,
+#else
+        strcat(c,
+#endif
+            va_arg(valist, const char*));
+    }
+    va_end(valist);
+    return c;
 }
 
 void Client::start() {
@@ -29,13 +55,9 @@ void Client::start() {
         throw "Unable to initialize GLFW";
     }
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    char c[20] = "Real2D ";
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-    strcat_s(c, 20, GAME_VER);
-#else
-    strcat(c, GAME_VER);
-#endif
+    auto c = appendTitle(0);
     window = glfwCreateWindow(DEF_W, DEF_H, c, nullptr, nullptr);
+    delete[] c;
     if (window == nullptr) {
         glfwTerminate();
         throw "Unable to create GLFW window";
@@ -75,7 +97,9 @@ void Client::start() {
     Window::fbcb(window, DEF_W, DEF_H);
     glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
     glEnable(GL_TEXTURE_2D);
-    world.create();
+    world = new World();
+    world->create();
+    player = new Player(world);
 
     loadTexture();
     timer.advanceTime();
@@ -85,33 +109,51 @@ void Client::start() {
     run();
 }
 void Client::run() {
-    double lastTime = glfwGetTime() * 1000;
+    __int64 lastTime = (__int64)(glfwGetTime() * 1000);
     int frames = 0;
     while (!glfwWindowShouldClose(window)) {
         timer.advanceTime();
-        double delta = timer.delta;
         for (int i = 0; i < timer.ticks; ++i) {
-            tick(delta);
+            tick();
         }
-        render();
+        render(timer.delta);
         glfwPollEvents();
         ++frames;
-        while (glfwGetTime() * 1000 >= lastTime + 1000) {
-            timer.fps = frames;
+        while (glfwGetTime() * 1000 >= lastTime + 1000LL) {
+            char s[32];
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+            sprintf_s(s, 32, " FPS: %d", frames);
+#else
+            sprintf(s, " FPS: %d", frames);
+#endif
+            auto c = appendTitle(1, s);
+            glfwSetWindowTitle(window, c);
+            delete[] c;
             lastTime += 1000;
             frames = 0;
         }
     }
 }
-void Client::render() {
+void Client::render(double delta) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    world.renderSelect();
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    world->renderSelect(delta);
+    player->render(delta);
+    glDisable(GL_DEPTH_TEST);
     glfwSwapBuffers(window);
 }
-void Client::tick(double delta) {
-    player.tick(delta);
+void Client::tick() {
+    world->tick();
+    player->tick();
 }
 Client::~Client() {
+    if (world != nullptr) {
+        delete world;
+    }
+    if (player != nullptr) {
+        delete player;
+    }
     glfwSetKeyCallback(window, nullptr);
     glfwSetFramebufferSizeCallback(window, nullptr);
     glfwSetCursorPosCallback(window, nullptr);

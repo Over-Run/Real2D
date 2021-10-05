@@ -86,6 +86,9 @@
     <ClInclude Include="include\real2d\hit.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="include\real2d\real2d_consts.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\res.rc">

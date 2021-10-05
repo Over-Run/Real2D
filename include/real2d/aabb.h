@@ -3,23 +3,35 @@
 namespace Real2D {
     struct AABBox {
         static const AABBox& FULL_CUBE;
-        int start_x;
-        int start_y;
-        int start_z;
-        int end_x;
-        int end_y;
-        int end_z;
+        float start_x;
+        float start_y;
+        float start_z;
+        float end_x;
+        float end_y;
+        float end_z;
 
-        AABBox(int _start_x,
-            int _start_y,
-            int _start_z,
-            int _end_x,
-            int _end_y,
-            int _end_z);
-        AABBox move(int xoffset,
-            int yoffset,
-            int zoffset);
+        AABBox(float _start_x,
+            float _start_y,
+            float _start_z,
+            float _end_x,
+            float _end_y,
+            float _end_z);
+        AABBox(const AABBox& other);
+        void move(float xoffset,
+            float yoffset,
+            float zoffset);
+        AABBox expand(float xoffset,
+            float yoffset,
+            float zoffset);
+        float clipXCollide(AABBox b, float xa);
+        float clipYCollide(AABBox b, float ya);
+        float clipZCollide(AABBox b, float za);
+        /// <summary>
+        /// Check b is intersect to self.
+        /// </summary>
+        /// <param name="b">The other box.</param>
+        /// <returns>Is b intersect to self</returns>
         bool isIntersect(AABBox& b);
-        bool isIntersect(int x, int y, int z);
+        bool isIntersect(float x, float y);
     };
 }
