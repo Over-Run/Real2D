@@ -25,6 +25,7 @@ AABBox* Block::getCollision() {
     return getOutline();
 }
 
+AirBlock::AirBlock(const int _id) : Block::Block(_id) {}
 AABBox* AirBlock::getCollision() {
     return nullptr;
 }
@@ -49,14 +50,9 @@ void BlockStates::setBlock(const Block& block_) {
     block = &block_;
 }*/
 
-block_t Blocks::AIR = new Block(0);
+block_t Blocks::AIR = new AirBlock(0);
 block_t Blocks::GRASS_BLOCK = new Block(1);
 block_t Blocks::STONE = new Block(2);
-Blocks::~Blocks() {
-    delete AIR;
-    delete GRASS_BLOCK;
-    delete STONE;
-}
 void Real2D::renderBlock(int x, int y, int z, block_t block) {
     GLfloat xi = (GLfloat)UNML(x);
     GLfloat xi1 = (GLfloat)UNML(x + 1);

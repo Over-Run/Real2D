@@ -7,11 +7,12 @@ extern float headYRot;
 namespace Real2D {
     class World;
     struct Player {
-        const float height;
+        const float bb_width;
+        const float bb_height;
         World* world;
-        Real2D::AABBox bb;
         float x, y, z;
-        float xo, yo;
+        float prev_x, prev_y;
+        Real2D::AABBox bb;
         bool onGround;
 
         Player(World* _world);

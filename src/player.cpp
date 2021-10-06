@@ -22,24 +22,23 @@ inline bool isKeyDown(int key) {
 }
 
 Player::Player(World* _world) :
-    x(16.0f),
-    y(9.0f),
-    z(1.0f),
-    xo(x), yo(y),
-    height(1.8f),
-    bb(AABBox(x, y, z, x + 1, y + height, z + 1)),
+    bb_width(0.6f),
+    bb_height(1.8f),
     world(_world),
+    x(16.0f), y(9.0f), z(1.0f),
+    prev_x(x), prev_y(y),
+    bb(AABBox(x - 0.3f, y, z, x + 0.3f, y + bb_height, z + 1)),
     onGround(false)
 {}
 void Player::tick() {
-    xo = x;
-    yo = y;
+    prev_x = x;
+    prev_y = y;
     float xa = 0;
     float ya = 0;
-    if (isKeyDown(GLFW_KEY_SPACE)) {
+    if (isKeyDown(GLFW_KEY_SPACE) || isKeyDown(GLFW_KEY_W)) {
         ++ya;
     }
-    if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+    if (isKeyDown(GLFW_KEY_LEFT_SHIFT) || isKeyDown(GLFW_KEY_S)) {
         --ya;
     }
     if (isKeyDown(GLFW_KEY_A)) {
@@ -65,28 +64,34 @@ void Player::tick() {
     }
 }
 void Player::move(float xa, float ya, float speed) {
-    float xaOrg = xa;
     float yaOrg = ya;
-    vector<AABBox> cubes = world->getCubes(bb.expand(xa, ya, 0));
-    for (auto cube : cubes) {
-        ya = cube.clipYCollide(bb, ya);
-    }
-    bb.move(0, ya, 0);
-    for (auto cube : cubes) {
-        xa = cube.clipXCollide(bb, xa);
-    }
-    bb.move(xa, 0, 0);
-    onGround = yaOrg != ya && yaOrg < 0;
     float xd = xa * speed;
     float yd = ya * speed;
-    if (xaOrg != xa) {
-        xd = 0;
+    vector<AABBox> cubes = world->getCubes(bb.expand(xd, yd, 0));
+    AABBox copybb;
+    copybb.set(bb);
+    if (xd != 0) {
+        for (auto c : cubes) {
+            bb.move(xd, 0, 0, &copybb);
+            if (c.isXCollide(copybb, xd)) {
+                xd = 0;
+                break;
+            }
+        }
     }
-    if (yaOrg != ya) {
-        yd = 0;
+    if (yd != 0) {
+        for (auto c : cubes) {
+            bb.move(0, yd, 0, &copybb);
+            if (c.isYCollide(copybb, yd)) {
+                yd = 0;
+                break;
+            }
+        }
     }
+    onGround = yaOrg != ya && yaOrg < 0.0f;
     x += xd;
     y += yd;
+    bb.move(xd, yd, 0);
 
     // round (the earth is a ball)
     if (x < 0) {
@@ -128,7 +133,7 @@ void Player::render(double delta) {
     glTranslatef(0, 0, 20.125f);
     // Head
     glPushMatrix();
-    glTranslatef(0, -16, -8);
+    glTranslatef(0, 48, -8);
     glRotatef(headXRot, 1, 0, 0);
     glRotatef(yRot, 0, 1, 0);
     glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
@@ -163,7 +168,7 @@ void Player::render(double delta) {
 
     // Body
     glPushMatrix();
-    glTranslatef(0, -16, 0);
+    glTranslatef(0, 48, 0);
     glRotatef(yRot, 0, 1, 0);
     glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
     glBegin(GL_QUADS);
@@ -187,7 +192,7 @@ void Player::render(double delta) {
 
     // right arm
     glPushMatrix();
-    glTranslatef(0, -16, 0);
+    glTranslatef(0, 48, 0);
     glRotatef(yRot, 0, 1, 0);
     glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
     glBegin(GL_QUADS);
@@ -211,7 +216,7 @@ void Player::render(double delta) {
 
     // left arm
     glPushMatrix();
-    glTranslatef(0, -16, 0);
+    glTranslatef(0, 48, 0);
     glRotatef(yRot, 0, 1, 0);
     glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
     glBegin(GL_QUADS);
@@ -235,52 +240,48 @@ void Player::render(double delta) {
 
     // right leg
     glPushMatrix();
-    glTranslatef(0, -16, 0);
     glRotatef(yRot, 0, 1, 0);
     glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
     glBegin(GL_QUADS);
     // front
-    glTexCoord2f(u4, v16); glVertex3f(-0.25f, -0.75f, 0.125f);
-    glTexCoord2f(u4, v28); glVertex3f(-0.25f, -1.5f, 0.125f);
-    glTexCoord2f(u8, v28); glVertex3f(0, -1.5f, 0.125f);
-    glTexCoord2f(u8, v16); glVertex3f(0, -0.75f, 0.125f);
+    glTexCoord2f(u4, v16); glVertex3f(-0.25f, 0.75f, 0.125f);
+    glTexCoord2f(u4, v28); glVertex3f(-0.25f, 0, 0.125f);
+    glTexCoord2f(u8, v28); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u8, v16); glVertex3f(0, 0.75f, 0.125f);
     // left
-    glTexCoord2f(u0, v16); glVertex3f(-0.25f, -0.75f, -0.125f);
-    glTexCoord2f(u0, v28); glVertex3f(-0.25f, -1.5f, -0.125f);
-    glTexCoord2f(u4, v28); glVertex3f(-0.25f, -1.5f, 0.125f);
-    glTexCoord2f(u4, v16); glVertex3f(-0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u0, v16); glVertex3f(-0.25f, 0.75f, -0.125f);
+    glTexCoord2f(u0, v28); glVertex3f(-0.25f, 0, -0.125f);
+    glTexCoord2f(u4, v28); glVertex3f(-0.25f, 0, 0.125f);
+    glTexCoord2f(u4, v16); glVertex3f(-0.25f, 0.75f, 0.125f);
     // right
-    glTexCoord2f(u8, v16); glVertex3f(0, -0.75f, 0.125f);
-    glTexCoord2f(u8, v28); glVertex3f(0, -1.5f, 0.125f);
-    glTexCoord2f(u16, v28); glVertex3f(0, -1.5f, -0.125f);
-    glTexCoord2f(u16, v16); glVertex3f(0, -0.75f, -0.125f);
+    glTexCoord2f(u8, v16); glVertex3f(0, 0.75f, 0.125f);
+    glTexCoord2f(u8, v28); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u16, v28); glVertex3f(0, 0, -0.125f);
+    glTexCoord2f(u16, v16); glVertex3f(0, 0.75f, -0.125f);
     glEnd();
     glPopMatrix();
 
     // left leg
     glPushMatrix();
-    glTranslatef(0, -16, 0);
     glRotatef(yRot, 0, 1, 0);
     glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
     glBegin(GL_QUADS);
     // front
-    glTexCoord2f(u16, v40); glVertex3f(0, -0.75f, 0.125f);
-    glTexCoord2f(u16, v52); glVertex3f(0, -1.5f, 0.125f);
-    glTexCoord2f(u20, v52); glVertex3f(0.25f, -1.5f, 0.125f);
-    glTexCoord2f(u20, v40); glVertex3f(0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u16, v40); glVertex3f(0, 0.75f, 0.125f);
+    glTexCoord2f(u16, v52); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u20, v52); glVertex3f(0.25f, 0, 0.125f);
+    glTexCoord2f(u20, v40); glVertex3f(0.25f, 0.75f, 0.125f);
     // left
-    glTexCoord2f(u12, v40); glVertex3f(0, -0.75f, -0.125f);
-    glTexCoord2f(u12, v52); glVertex3f(0, -1.5f, -0.125f);
-    glTexCoord2f(u16, v52); glVertex3f(0, -1.5f, 0.125f);
-    glTexCoord2f(u16, v40); glVertex3f(0, -0.75f, 0.125f);
+    glTexCoord2f(u12, v40); glVertex3f(0, 0.75f, -0.125f);
+    glTexCoord2f(u12, v52); glVertex3f(0, 0, -0.125f);
+    glTexCoord2f(u16, v52); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u16, v40); glVertex3f(0, 0.75f, 0.125f);
     // right
-    glTexCoord2f(u20, v40); glVertex3f(0.25f, -0.75f, 0.125f);
-    glTexCoord2f(u20, v52); glVertex3f(0.25f, -1.5f, 0.125f);
-    glTexCoord2f(u24, v52); glVertex3f(0.25f, -1.5f, -0.125f);
-    glTexCoord2f(u24, v40); glVertex3f(0.25f, -0.75f, -0.125f);
+    glTexCoord2f(u20, v40); glVertex3f(0.25f, 0.75f, 0.125f);
+    glTexCoord2f(u20, v52); glVertex3f(0.25f, 0, 0.125f);
+    glTexCoord2f(u24, v52); glVertex3f(0.25f, 0, -0.125f);
+    glTexCoord2f(u24, v40); glVertex3f(0.25f, 0.75f, -0.125f);
     glEnd();
-    glPopMatrix();
-
     glPopMatrix();
 
     texmgr.bindTexture(0);
@@ -295,7 +296,7 @@ void Player::render(double delta) {
     const GLfloat hbts = (GLfloat)BLOCK_TEX_SIZE * 0.5f;
     texmgr.bindTexture(blocks);
     glPushMatrix();
-    glTranslatef(0, -16, 0);
+    glTranslatef(0, 48, 0);
     glRotatef(yRot, 0, 1, 0);
     glBegin(GL_QUADS);
     glTexCoord2f(bu0, bv0); glVertex3f(-12 - hbts, -24, 5);
@@ -305,6 +306,8 @@ void Player::render(double delta) {
     glEnd();
     glPopMatrix();
     texmgr.bindTexture(0);
+
+    glPopMatrix();
 
     glPopMatrix();
 }

@@ -20,15 +20,33 @@ start_z(o.start_z),
 end_x(o.end_x),
 end_y(o.end_y),
 end_z(o.end_z) {}
-void AABBox::move(float xoffset,
+void AABBox::set(const AABBox& o) {
+    start_x = o.start_x;
+    start_y = o.start_y;
+    start_z = o.start_z;
+    end_x = o.end_x;
+    end_y = o.end_y;
+    end_z = o.end_z;
+}
+bool AABBox::move(float xoffset,
+    float yoffset,
+    float zoffset,
+    AABBox* dst) {
+    if (dst != nullptr) {
+        dst->start_x = start_x + xoffset;
+        dst->start_y = start_y + yoffset;
+        dst->start_z = start_z + zoffset;
+        dst->end_x = end_x + xoffset;
+        dst->end_y = end_y + yoffset;
+        dst->end_z = end_z + zoffset;
+        return true;
+    }
+    return false;
+}
+bool AABBox::move(float xoffset,
     float yoffset,
     float zoffset) {
-    start_x += xoffset;
-    start_y += yoffset;
-    start_z += zoffset;
-    end_x += xoffset;
-    end_y += yoffset;
-    end_z += zoffset;
+    return move(xoffset, yoffset, zoffset, this);
 }
 AABBox AABBox::expand(float xoffset,
     float yoffset,
@@ -39,50 +57,41 @@ AABBox AABBox::expand(float xoffset,
     float fex = end_x;
     float fey = end_y;
     float fez = end_z;
-#define _EXP(a) if (##a##offset < 0) { fs##a## += ##a##offset; } \
-    if (##a##offset > 0) { fe##a## += ##a##offset; }
+#define _EXP(a) if (a##offset < 0) { fs##a += a##offset; } \
+    if (a##offset > 0) { fe##a += a##offset; }
     _EXP(x);
     _EXP(y);
     _EXP(z);
 #undef _EXP
     return AABBox(fsx, fsy, fsz, fex, fey, fez);
 }
-#define _CLIP_COL(A, B, C, D, E, F) \
-float AABBox::clip##D##Collide(AABBox b, ##E) { \
-    float sx = start_x; \
-    float sy = start_y; \
-    float sz = start_z; \
-    float ex = end_x; \
-    float ey = end_y; \
-    float ez = end_z; \
-    float bsx = b.start_x; \
-    float bsy = b.start_y; \
-    float bsz = b.start_z; \
-    float bex = b.end_x; \
-    float bey = b.end_y; \
-    float bez = b.end_z; \
-    if (bs##B < e##B && be##B > s##B \
-        && bs##C < e##C && be##C > s##C) { \
-        float max; \
-        if (A##a > 0 && be##A <= s##A) { \
-            max = s##A - be##A; \
-            if (max < ##A##a) { \
-                A##a = max; \
-            } \
-        } \
-        if (A##a < 0 && bs##A >= e##A) { \
-            max = e##A - bs##A; \
-            if (max > A##a) { \
-                A##a = max; \
-            } \
-        } \
-    } \
-    ##F; \
+bool AABBox::isXCollide(AABBox& b, float axs) {
+    if (axs < 0) {
+        return b.start_x <= end_x && b.end_x > start_x;
+    }
+    if (axs > 0) {
+        return b.end_x >= start_x && b.start_x < end_x;
+    }
+    return false;
 }
-_CLIP_COL(x, y, z, X, float xa, return xa)
-_CLIP_COL(y, x, z, Y, float ya, return ya)
-_CLIP_COL(z, x, y, Z, float za, return za)
-#undef _CLIP_COL
+bool AABBox::isYCollide(AABBox& b, float axs) {
+    if (axs < 0) {
+        return b.start_y <= end_y && b.end_y > end_y;
+    }
+    if (axs > 0) {
+        return b.end_y >= start_y && b.start_y < start_y;
+    }
+    return false;
+}
+bool AABBox::isZCollide(AABBox& b, float axs) {
+    if (axs < 0) {
+        return b.start_z <= end_z && b.end_z > end_z;
+    }
+    if (axs > 0) {
+        return b.end_z >= start_z && start_z < start_z;
+    }
+    return false;
+}
 bool AABBox::isIntersect(AABBox& b) {
     float sx = start_x;
     float sy = start_y;

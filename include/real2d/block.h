@@ -4,7 +4,7 @@
 
 namespace Real2D {
     class Block {
-    private:
+    protected:
         const int id;
     public:
         Block(const int _id);
@@ -21,6 +21,9 @@ namespace Real2D {
         virtual AABBox* getCollision();
     };
     class AirBlock : public Block {
+    public:
+        AirBlock(const int _id);
+
         virtual AABBox* getCollision();
     };
 
@@ -45,8 +48,6 @@ namespace Real2D {
         static block_t AIR;
         static block_t GRASS_BLOCK;
         static block_t STONE;
-
-        ~Blocks();
     };
 
     /// <summary>

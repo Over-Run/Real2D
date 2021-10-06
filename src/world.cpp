@@ -83,8 +83,8 @@ void renderHit(double delta) {
     float x = (float)hit_result->x;
     float y = (float)hit_result->y;
     float z = (float)hit_result->z;
-    AABBox bb = AABBox(*hit_result->block->getOutline());
-    bb.move(x, y, z);
+    AABBox bb;
+    hit_result->block->getOutline()->move(x, y, z, &bb);
     GLfloat fz = UNML(bb.start_z);
     GLfloat fx = UNML(bb.start_x);
     GLfloat fx1 = UNML(bb.end_x);
@@ -181,37 +181,26 @@ std::vector<AABBox> World::getCubes(AABBox box) {
     int x1 = (int)(box.end_x + 1);
     int y0 = (int)box.start_y;
     int y1 = (int)(box.end_y + 1);
-    int z0 = (int)box.start_z;
-    int z1 = (int)(box.end_z + 1);
     if (x0 < 0) {
         x0 = 0;
     }
     if (y0 < 0) {
         y0 = 0;
     }
-    if (z0 < 0) {
-        z0 = 0;
-    }
     if (x1 > WORLD_W) {
         x1 = WORLD_W;
     }
-
     if (y1 > WORLD_H) {
         y1 = WORLD_H;
     }
-    if (z1 > WORLD_D) {
-        z1 = WORLD_D;
-    }
     for (int x = x0; x < x1; ++x) {
         for (int y = y0; y < y1; ++y) {
-            for (int z = z0; z < z1; ++z) {
-                block_t block = getBlock(x, y, z);
-                AABBox* cube = block->getCollision();
-                if (cube != nullptr) {
-                    AABBox b = AABBox(*cube);
-                    b.move((float)x, (float)y, (float)z);
-                    cubes.push_back(b);
-                }
+            block_t block = getBlock(x, y, 1);
+            AABBox* cube = block->getCollision();
+            if (cube != nullptr) {
+                AABBox b;
+                cube->move((float)x, (float)y, 1, &b);
+                cubes.push_back(b);
             }
         }
     }

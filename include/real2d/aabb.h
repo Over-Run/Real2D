@@ -10,22 +10,27 @@ namespace Real2D {
         float end_y;
         float end_z;
 
-        AABBox(float _start_x,
-            float _start_y,
-            float _start_z,
-            float _end_x,
-            float _end_y,
-            float _end_z);
+        AABBox(float _start_x = 0,
+            float _start_y = 0,
+            float _start_z = 0,
+            float _end_x = 0,
+            float _end_y = 0,
+            float _end_z = 0);
         AABBox(const AABBox& other);
-        void move(float xoffset,
+        void set(const AABBox& other);
+        bool move(float xoffset,
+            float yoffset,
+            float zoffset,
+            AABBox* dst);
+        bool move(float xoffset,
             float yoffset,
             float zoffset);
         AABBox expand(float xoffset,
             float yoffset,
             float zoffset);
-        float clipXCollide(AABBox b, float xa);
-        float clipYCollide(AABBox b, float ya);
-        float clipZCollide(AABBox b, float za);
+        bool isXCollide(AABBox& b, float axs);
+        bool isYCollide(AABBox& b, float axs);
+        bool isZCollide(AABBox& b, float axs);
         /// <summary>
         /// Check b is intersect to self.
         /// </summary>
