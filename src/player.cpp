@@ -64,16 +64,16 @@ void Player::tick() {
     }
 }
 void Player::move(float xa, float ya, float speed) {
-    float yaOrg = ya;
     float xd = xa * speed;
     float yd = ya * speed;
+    float ydOrg = yd;
     vector<AABBox> cubes = world->getCubes(bb.expand(xd, yd, 0));
     AABBox copybb;
     copybb.set(bb);
     if (xd != 0) {
         for (auto c : cubes) {
             bb.move(xd, 0, 0, &copybb);
-            if (c.isXCollide(copybb, xd)) {
+            if (c.isIntersect(copybb)) {
                 xd = 0;
                 break;
             }
@@ -82,31 +82,41 @@ void Player::move(float xa, float ya, float speed) {
     if (yd != 0) {
         for (auto c : cubes) {
             bb.move(0, yd, 0, &copybb);
-            if (c.isYCollide(copybb, yd)) {
+            if (c.isIntersect(copybb)) {
                 yd = 0;
                 break;
             }
         }
     }
-    onGround = yaOrg != ya && yaOrg < 0.0f;
+    float ox = x;
+    float oy = y;
+
+    onGround = ydOrg != yd && ydOrg < 0.0f;
     x += xd;
     y += yd;
-    bb.move(xd, yd, 0);
+
+    float fxd = xd;
+    float fyd = yd;
 
     // round (the earth is a ball)
     if (x < 0) {
         x = WORLD_W;
+        fxd = x - ox;
     }
     if (x > WORLD_W) {
         x = 0;
+        fxd = x - ox;
     }
     if (y < -5) {
         y = -5;
+        fyd = 0;
     }
+
+    bb.move(fxd, fyd, 0);
 }
 void Player::render(double delta) {
     glPushMatrix();
-    glTranslatef(Window::width * 0.5f, Window::height * 0.5f, 0);
+    glTranslatef(Window::width * 0.5f, Window::height * 0.5f, 20.125f);
     GLuint id = texmgr.loadTexture(TEX_PLAYER);
 
     const GLfloat u0 = 0;
@@ -129,8 +139,6 @@ void Player::render(double delta) {
 
     glColor3f(1.0f, 1.0f, 1.0f);
     texmgr.bindTexture(id);
-    glPushMatrix();
-    glTranslatef(0, 0, 20.125f);
     // Head
     glPushMatrix();
     glTranslatef(0, 48, -8);
@@ -306,8 +314,6 @@ void Player::render(double delta) {
     glEnd();
     glPopMatrix();
     texmgr.bindTexture(0);
-
-    glPopMatrix();
 
     glPopMatrix();
 }

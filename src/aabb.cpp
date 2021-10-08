@@ -105,20 +105,9 @@ bool AABBox::isIntersect(AABBox& b) {
     float bex = b.end_x;
     float bey = b.end_y;
     float bez = b.end_z;
-#if 1
     return bsx < ex && bex > sx
         && bsy < ey && bey > sy
         && bsz < ez && bez > sz;
-#else
-    return (bsx >= sx && bsx <= ex && bsy >= sy && bsy <= ey && bsz >= sz && bsz <= ez)
-        || (bsx >= sx && bsx <= ex && bsy >= sy && bsy <= ey && bez >= sz && bez <= ez)
-        || (bex >= sx && bex <= ex && bsy >= sy && bsy <= ey && bez >= sz && bez <= ez)
-        || (bex >= sx && bex <= ex && bsy >= sy && bsy <= ey && bsz >= sz && bsz <= ez)
-        || (bsx >= sx && bsx <= ex && bey >= sy && bey <= ey && bsz >= sz && bsz <= ez)
-        || (bsx >= sx && bsx <= ex && bey >= sy && bey <= ey && bez >= sz && bez <= ez)
-        || (bex >= sx && bex <= ex && bey >= sy && bey <= ey && bez >= sz && bez <= ez)
-        || (bex >= sx && bex <= ex && bey >= sy && bey <= ey && bsz >= sz && bsz <= ez);
-#endif
 }
 bool AABBox::isIntersect(float x, float y) {
     float sx = start_x;
