@@ -176,12 +176,13 @@
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\hit.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\packet.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\rmath.cpp" />
-    <ClCompile Include="src\stb.cpp" />
-    <ClCompile Include="src\texmgr.cpp" />
+    <ClCompile Include="src\stb_c.cpp" />
+    <ClCompile Include="src\texmgr_c.cpp" />
     <ClCompile Include="src\timer.cpp" />
-    <ClCompile Include="src\window.cpp" />
+    <ClCompile Include="src\window_c.cpp" />
     <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -194,10 +195,10 @@
     <ClInclude Include="include\real2d\real2d_def.h" />
     <ClInclude Include="include\real2d\real2d_def_c.h" />
     <ClInclude Include="include\real2d\rmath.h" />
-    <ClInclude Include="include\real2d\stb.h" />
-    <ClInclude Include="include\real2d\texmgr.h" />
+    <ClInclude Include="include\real2d\stb_c.h" />
+    <ClInclude Include="include\real2d\texmgr_c.h" />
     <ClInclude Include="include\real2d\timer.h" />
-    <ClInclude Include="include\real2d\window.h" />
+    <ClInclude Include="include\real2d\window_c.h" />
     <ClInclude Include="include\real2d\world.h" />
   </ItemGroup>
   <ItemGroup>

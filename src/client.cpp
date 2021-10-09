@@ -1,12 +1,12 @@
 #include "real2d/client.h"
-#include "real2d/window.h"
+#include "real2d/window_c.h"
 #include "GLFW/glfw3.h"
 #include "glad/gl.h"
-#include "real2d/stb.h"
+#include "real2d/stb_c.h"
 #include "real2d/timer.h"
 #include "real2d/world.h"
 #include "real2d/player.h"
-#include "real2d/texmgr.h"
+#include "real2d/texmgr_c.h"
 #include "real2d/real2d_def_c.h"
 #include <cstdarg>
 #include <cstdlib>

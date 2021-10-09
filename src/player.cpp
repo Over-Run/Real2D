@@ -1,6 +1,6 @@
 #include "real2d/player.h"
-#include "real2d/texmgr.h"
-#include "real2d/window.h"
+#include "real2d/texmgr_c.h"
+#include "real2d/window_c.h"
 #include "real2d/block.h"
 #include "real2d/world.h"
 #include "real2d/real2d_def_c.h"

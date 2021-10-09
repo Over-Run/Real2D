@@ -1,14 +1,18 @@
-#include "real2d/texmgr.h"
+#include "real2d/texmgr_c.h"
 #include "real2d/player.h"
 #include "real2d/world.h"
-#include "real2d/window.h"
+#include "real2d/window_c.h"
 #include "real2d/aabb.h"
 #include "real2d/hit.h"
 #include "real2d/real2d_def_c.h"
-#include <malloc.h>
+#include <fstream>
 
 #define WORLD_BLOCK_I(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
 
+using std::ifstream;
+using std::ofstream;
+using std::ios;
+using std::endl;
 using Real2D::Window;
 using Real2D::block_t;
 using Real2D::Blocks;
@@ -31,10 +35,13 @@ bool isMouseDown(int button) {
     return glfwGetMouseButton(window, button);
 }
 
-World::World() : world((block_t*)malloc(sizeof(block_t)* WORLD_SIZE)), is_dirty(true) {}
+World::World() :
+    version(WORLD_VER),
+    world(new block_t[WORLD_SIZE]),
+    is_dirty(true) {}
 World::~World() {
     if (world != nullptr) {
-        free(world);
+        delete world;
     }
     if (glDeleteLists) {
         glDeleteLists(list, 1);
@@ -232,4 +239,33 @@ void World::setBlock(int x, int y, int z, block_t block) {
         world[WORLD_BLOCK_I(x, y, z)] = block;
         markDirty();
     }
+}
+
+void World::load() {
+    ifstream level;
+    level.open("level.dat", ios::in | ios::binary);
+    if (!level.is_open()) {
+        throw "Couldn't open level.dat";
+    }
+    level.read((char*)&version, sizeof(int));
+    if (version >= 1 && version <= 1) {
+        for (size_t i = 0; i < WORLD_SIZE; ++i) {
+            int id;
+            level.read((char*)&id, sizeof(int));
+            world[i] = reg;
+        }
+    }
+}
+void World::save() {
+    ofstream level;
+    level.open("level.dat", ios::out | ios::trunc | ios::binary);
+    if (!level.is_open()) {
+        throw "Couldn't open level.dat";
+    }
+    level.write((char*)&version, sizeof(int));
+    for (size_t i = 0; i < WORLD_SIZE; ++i) {
+        int id = world[i]->getId();
+        level.write((char*)&id, sizeof(int));
+    }
+    level.close();
 }

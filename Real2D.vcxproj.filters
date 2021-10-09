@@ -51,13 +51,13 @@
     <ClCompile Include="src\hit.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\window.cpp">
+    <ClCompile Include="src\window_c.cpp">
       <Filter>Sources\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\texmgr.cpp">
+    <ClCompile Include="src\texmgr_c.cpp">
       <Filter>Sources\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\stb.cpp">
+    <ClCompile Include="src\stb_c.cpp">
       <Filter>Sources\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\client.cpp">
@@ -68,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="src\world.cpp">
       <Filter>Sources\World</Filter>
+    </ClCompile>
+    <ClCompile Include="src\packet.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,26 +95,26 @@
     <ClInclude Include="include\real2d\client.h">
       <Filter>Headers\Client</Filter>
     </ClInclude>
-    <ClInclude Include="include\real2d\texmgr.h">
+    <ClInclude Include="include\real2d\texmgr_c.h">
       <Filter>Headers\Client</Filter>
     </ClInclude>
-    <ClInclude Include="include\real2d\window.h">
+    <ClInclude Include="include\real2d\window_c.h">
       <Filter>Headers\Client</Filter>
     </ClInclude>
-    <ClInclude Include="include\real2d\stb.h">
+    <ClInclude Include="include\real2d\stb_c.h">
       <Filter>Headers\Client</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\real2d_def_c.h">
       <Filter>Headers\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="include\real2d\packet.h">
-      <Filter>Headers\Server</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\block.h">
       <Filter>Headers\World</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\world.h">
       <Filter>Headers\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\packet.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

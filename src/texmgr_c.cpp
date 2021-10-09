@@ -1,5 +1,5 @@
-#include "real2d/texmgr.h"
-#include "real2d/stb.h"
+#include "real2d/texmgr_c.h"
+#include "real2d/stb_c.h"
 
 using Real2D::TexMgr;
 using std::map;

@@ -5,17 +5,21 @@
 #include "block.h"
 
 namespace Real2D {
+    struct Packet {
+        virtual void sendPacket() = 0;
+    };
+    struct PacketC2S : public Packet {
+    protected:
+        static std::stack<PacketC2S*> stack;
+    public:
+        void sendPacket();
+        static Packet* getLastPacket();
+    };
     struct PlayerPacketC2S : public PacketC2S {
         block_t choosingBlock;
-        void sendPacket();
     };
-    class PacketC2S : public Packet {
-    protected:
-        std::stack<PacketS2C> stack;
+    struct KeyPacketC2S : public PacketC2S {
+        int key;
+        int action;
     };
-    class PacketS2C : public Packet {
-    protected:
-        std::stack<PacketC2S> stack;
-    };
-    class Packet {};
 }

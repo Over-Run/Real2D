@@ -1,9 +1,12 @@
+0.4.0
+New feature: Lighting system
+
 0.3.0
 New feature: Use key z to switch axis z to 0..1
 New feature: Player 3D model
-New feature: Lighting system
 New feature: Collision box
 New feature: Split client
+New feature: Save the world
 
 0.2.0
 New feature: main.cpp objective
