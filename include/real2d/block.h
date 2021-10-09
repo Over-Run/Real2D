@@ -1,6 +1,5 @@
 #pragma once
 #include "aabb.h"
-#include "real2d_consts.h"
 
 namespace Real2D {
     class Block {

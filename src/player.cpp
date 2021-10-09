@@ -3,6 +3,7 @@
 #include "real2d/window.h"
 #include "real2d/block.h"
 #include "real2d/world.h"
+#include "real2d/real2d_def_c.h"
 #include <cmath>
 
 using Real2D::Player;

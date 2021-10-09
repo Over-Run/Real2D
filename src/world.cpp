@@ -4,6 +4,7 @@
 #include "real2d/window.h"
 #include "real2d/aabb.h"
 #include "real2d/hit.h"
+#include "real2d/real2d_def_c.h"
 #include <malloc.h>
 
 #define WORLD_BLOCK_I(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)

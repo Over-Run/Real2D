@@ -1,5 +1,6 @@
 #include "real2d/window.h"
 #include "real2d/world.h"
+#include "real2d/real2d_def.h"
 #include <iostream>
 
 using std::cerr;

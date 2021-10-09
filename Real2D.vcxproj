@@ -189,8 +189,10 @@
     <ClInclude Include="include\real2d\block.h" />
     <ClInclude Include="include\real2d\client.h" />
     <ClInclude Include="include\real2d\hit.h" />
+    <ClInclude Include="include\real2d\packet.h" />
     <ClInclude Include="include\real2d\player.h" />
-    <ClInclude Include="include\real2d\real2d_consts.h" />
+    <ClInclude Include="include\real2d\real2d_def.h" />
+    <ClInclude Include="include\real2d\real2d_def_c.h" />
     <ClInclude Include="include\real2d\rmath.h" />
     <ClInclude Include="include\real2d\stb.h" />
     <ClInclude Include="include\real2d\texmgr.h" />

@@ -7,6 +7,7 @@
 #include "real2d/world.h"
 #include "real2d/player.h"
 #include "real2d/texmgr.h"
+#include "real2d/real2d_def_c.h"
 #include <cstdarg>
 #include <cstdlib>
 

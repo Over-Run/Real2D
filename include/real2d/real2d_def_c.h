@@ -1,11 +1,9 @@
 #pragma once
+#include "real2d_def.h"
 
 // world
-constexpr int WORLD_W = 48;
-constexpr int WORLD_H = 32;
-constexpr int WORLD_D = 2;
-constexpr int WORLD_SIZE = WORLD_W * WORLD_H * WORLD_D;
 constexpr auto WORLD_RENDER_NML = 32.0f;
+#define UNML(x) ((x) * WORLD_RENDER_NML)
 
 // player
 constexpr const char* TEX_PLAYER = "res/player.png";
@@ -25,9 +23,5 @@ constexpr auto BLOCK_TEX_UV_FACTOR = (float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_S
 #define BLOCK_TEX_U1(id) (((id) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR)
 #define BLOCK_TEX_V0(id) ((((id) - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR)
 #define BLOCK_TEX_V1(id) ((((id) / BLOCKS_PER_TEX) + 1) * BLOCK_TEX_UV_FACTOR)
-#define X_OFFSET (GLfloat)(int)((Real2D::Window::width * 0.5f) - (int)(player->prev_x * WORLD_RENDER_NML))
-#define Y_OFFSET (GLfloat)(int)((Real2D::Window::height * 0.5f) - (int)((player->prev_y) * WORLD_RENDER_NML))
-#define BLOCK(nm) (Real2D::Blocks::nm)
-#define AIR_BLOCK BLOCK(AIR)
-
-#define UNML(x) ((x) * WORLD_RENDER_NML)
+#define X_OFFSET (GLfloat)(int)((Real2D::Window::width * 0.5f) - (int)UNML(player->prev_x))
+#define Y_OFFSET (GLfloat)(int)((Real2D::Window::height * 0.5f) - (int)UNML(player->prev_y))
