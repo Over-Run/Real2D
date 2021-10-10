@@ -27,7 +27,8 @@ void loadTexture() {
 }
 
 const char* appendTitle(int count, ...) {
-    char* c = new char[80]{ "Real2D " };
+    char* c = new char[80];
+    memset(c, 0, 80);
     va_list valist;
     va_start(valist, count);
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -106,7 +107,7 @@ void Client::start() {
     run();
 }
 void Client::run() {
-    __int64 lastTime = (__int64)(glfwGetTime() * 1000);
+    int64_t lastTime = (int64_t)(glfwGetTime() * 1000);
     int frames = 0;
     while (!glfwWindowShouldClose(window)) {
         timer.advanceTime();

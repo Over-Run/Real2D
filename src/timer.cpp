@@ -5,11 +5,11 @@
 using Real2D::Timer;
 
 Timer::Timer(double tps_) : tps(tps_) {
-    lastTime = (__int64)(glfwGetTime() * NS_PER_SECOND);
+    lastTime = (int64_t)(glfwGetTime() * NS_PER_SECOND);
 }
 void Timer::advanceTime() {
-    __int64 now = (__int64)(glfwGetTime() * NS_PER_SECOND);
-    __int64 passedNs = now - lastTime;
+    int64_t now = (int64_t)(glfwGetTime() * NS_PER_SECOND);
+    int64_t passedNs = now - lastTime;
     lastTime = now;
     if (passedNs < 0) {
         passedNs = 0;

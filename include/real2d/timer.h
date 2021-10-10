@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 constexpr auto NS_PER_SECOND = 1000000000LL;
 constexpr auto MAX_NS_PER_UPDATE = 1000000000LL;
@@ -8,7 +9,7 @@ namespace Real2D {
     class Timer {
     private:
         const double tps;
-        __int64 lastTime;
+        int64_t lastTime;
     public:
         int ticks = 0;
         double delta = 0;

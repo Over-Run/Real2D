@@ -123,10 +123,6 @@ bool AABBox::isIntersect(AABBox& b) {
         && bsz < ez && bez > sz;
 }
 bool AABBox::isIntersect(float x, float y) {
-    float sx = start_x;
-    float sy = start_y;
-    float ex = end_x;
-    float ey = end_y;
     return x >= start_x && x <= end_x
         && y >= start_y && y <= end_y;
 }
