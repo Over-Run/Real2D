@@ -28,6 +28,19 @@ void AABBox::set(const AABBox& o) {
     end_y = o.end_y;
     end_z = o.end_z;
 }
+void AABBox::set(float _start_x,
+    float _start_y,
+    float _start_z,
+    float _end_x,
+    float _end_y,
+    float _end_z) {
+    start_x = _start_x;
+    start_y = _start_y;
+    start_z = _start_z;
+    end_x = _end_x;
+    end_y = _end_y;
+    end_z = _end_z;
+}
 bool AABBox::move(float xoffset,
     float yoffset,
     float zoffset,

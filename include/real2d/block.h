@@ -3,10 +3,8 @@
 
 namespace Real2D {
     class Block {
-    protected:
-        const int id;
     public:
-        Block(const int _id);
+        Block();
         Block(const Block&) = delete;
         Block operator=(const Block&) = delete;
         bool operator==(const Block&) const;
@@ -15,14 +13,12 @@ namespace Real2D {
         /// Get this block's raw id.
         /// </summary>
         /// <returns>The raw id.</returns>
-        int getId();
+        int getId() const;
         virtual AABBox* getOutline();
         virtual AABBox* getCollision();
     };
     class AirBlock : public Block {
     public:
-        AirBlock(const int _id);
-
         virtual AABBox* getCollision();
     };
 

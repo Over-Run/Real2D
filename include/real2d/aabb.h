@@ -18,6 +18,12 @@ namespace Real2D {
             float _end_z = 0);
         AABBox(const AABBox& other);
         void set(const AABBox& other);
+        void set(float _start_x,
+            float _start_y,
+            float _start_z,
+            float _end_x,
+            float _end_y,
+            float _end_z);
         bool move(float xoffset,
             float yoffset,
             float zoffset,

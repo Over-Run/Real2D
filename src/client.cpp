@@ -5,7 +5,6 @@
 #include "real2d/stb_c.h"
 #include "real2d/timer.h"
 #include "real2d/world.h"
-#include "real2d/player.h"
 #include "real2d/texmgr_c.h"
 #include "real2d/real2d_def_c.h"
 #include <cstdarg>
@@ -14,14 +13,12 @@
 using std::va_list;
 using Real2D::Timer;
 using Real2D::World;
-using Real2D::Player;
 using Real2D::Client;
 
 window_t window;
 
 Timer timer(60);
 World* world;
-Player* player;
 
 GLuint blocks;
 
@@ -100,7 +97,6 @@ void Client::start() {
     glEnable(GL_TEXTURE_2D);
     world = new World();
     world->create();
-    player = new Player(world);
 
     loadTexture();
     timer.advanceTime();
@@ -140,20 +136,15 @@ void Client::render(double delta) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     world->renderSelect(delta);
-    player->render(delta);
     glDisable(GL_DEPTH_TEST);
     glfwSwapBuffers(window);
 }
 void Client::tick() {
     world->tick();
-    player->tick();
 }
 Client::~Client() {
     if (world != nullptr) {
         delete world;
-    }
-    if (player != nullptr) {
-        delete player;
     }
     glfwSetKeyCallback(window, nullptr);
     glfwSetFramebufferSizeCallback(window, nullptr);

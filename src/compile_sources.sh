@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sources=(timer.cpp stb.cpp texmgr.cpp window.cpp player.cpp aabb.cpp hit.cpp block.cpp world.cpp client.cpp main.cpp)
+sources=(aabb.cpp block.cpp client.cpp files.cpp hit.cpp main.cpp packet.cpp rmath.cpp stb_c.cpp texmgr_c.cpp)

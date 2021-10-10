@@ -5,6 +5,8 @@
 #include "real2d/aabb.h"
 #include "real2d/hit.h"
 #include "real2d/real2d_def_c.h"
+#include "real2d/reg.h"
+#include "real2d/files.h"
 #include <fstream>
 
 #define WORLD_BLOCK_I(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
@@ -20,6 +22,7 @@ using Real2D::Player;
 using Real2D::World;
 using Real2D::AABBox;
 using Real2D::HitResult;
+using Real2D::Registries;
 
 extern window_t window;
 
@@ -38,30 +41,37 @@ bool isMouseDown(int button) {
 World::World() :
     version(WORLD_VER),
     world(new block_t[WORLD_SIZE]),
+    player(new Player(this)),
     is_dirty(true) {}
 World::~World() {
+    save();
     if (world != nullptr) {
         delete world;
+    }
+    if (player != nullptr) {
+        delete player;
     }
     if (glDeleteLists) {
         glDeleteLists(list, 1);
     }
 }
 void World::create() {
-    for (int z = 0; z < WORLD_D; ++z) {
-        for (int x = 0; x < WORLD_W; ++x) {
-            for (int y = 0; y < WORLD_H; ++y) {
-                block_t b;
-                if (y < 3) {
-                    b = BLOCK(STONE);
+    if (!load()) {
+        for (int z = 0; z < WORLD_D; ++z) {
+            for (int x = 0; x < WORLD_W; ++x) {
+                for (int y = 0; y < WORLD_H; ++y) {
+                    block_t b;
+                    if (y < 3) {
+                        b = BLOCK(STONE);
+                    }
+                    else if (y == 3) {
+                        b = BLOCK(GRASS_BLOCK);
+                    }
+                    else {
+                        b = AIR_BLOCK;
+                    }
+                    setBlock(x, y, z, b);
                 }
-                else if (y == 3) {
-                    b = BLOCK(GRASS_BLOCK);
-                }
-                else {
-                    b = AIR_BLOCK;
-                }
-                setBlock(x, y, z, b);
             }
         }
     }
@@ -158,6 +168,8 @@ void World::renderSelect(double delta) {
     glPopMatrix();
 
     glDisable(GL_BLEND);
+
+    player->render(delta);
 }
 
 void World::tick() {
@@ -181,6 +193,7 @@ void World::tick() {
             }
         }
     }
+    player->tick();
 }
 
 std::vector<AABBox> World::getCubes(AABBox box) {
@@ -241,31 +254,53 @@ void World::setBlock(int x, int y, int z, block_t block) {
     }
 }
 
-void World::load() {
-    ifstream level;
-    level.open("level.dat", ios::in | ios::binary);
+void stream_write(ofstream& os, int* i) {
+    os.write((char*)i, sizeof(int));
+}
+void stream_write(ofstream& os, float* i) {
+    os.write((char*)i, sizeof(float));
+}
+void stream_read(ifstream& is, int* i) {
+    is.read((char*)i, sizeof(int));
+}
+void stream_read(ifstream& is, float* i) {
+    is.read((char*)i, sizeof(float));
+}
+void World::save() {
+    createDir("saves/");
+    ofstream level;
+    level.open("saves/level.dat", ios::out | ios::trunc | ios::binary);
     if (!level.is_open()) {
         throw "Couldn't open level.dat";
     }
-    level.read((char*)&version, sizeof(int));
+    stream_write(level, &version);
+    for (size_t i = 0; i < WORLD_SIZE; ++i) {
+        int id = world[i]->getId();
+        stream_write(level, &id);
+    }
+    stream_write(level, &player->x);
+    stream_write(level, &player->y);
+    stream_write(level, &player->z);
+    level.close();
+}
+bool World::load() {
+    createDir("saves/");
+    ifstream level;
+    level.open("saves/level.dat", ios::in | ios::binary);
+    if (!level.is_open()) {
+        return false;
+    }
+    stream_read(level, &version);
     if (version >= 1 && version <= 1) {
         for (size_t i = 0; i < WORLD_SIZE; ++i) {
             int id;
-            level.read((char*)&id, sizeof(int));
-            world[i] = reg;
+            stream_read(level, &id);
+            world[i] = Registries::BLOCK->get(id);
         }
+        stream_read(level, &player->x);
+        stream_read(level, &player->y);
+        stream_read(level, &player->z);
+        return true;
     }
-}
-void World::save() {
-    ofstream level;
-    level.open("level.dat", ios::out | ios::trunc | ios::binary);
-    if (!level.is_open()) {
-        throw "Couldn't open level.dat";
-    }
-    level.write((char*)&version, sizeof(int));
-    for (size_t i = 0; i < WORLD_SIZE; ++i) {
-        int id = world[i]->getId();
-        level.write((char*)&id, sizeof(int));
-    }
-    level.close();
+    return false;
 }

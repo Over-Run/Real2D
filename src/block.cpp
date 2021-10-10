@@ -1,23 +1,29 @@
 #include "real2d/block.h"
 #include "real2d/player.h"
 #include "real2d/real2d_def_c.h"
+#include "real2d/reg.h"
 #include "glad/gl.h"
 
+using std::string;
 using Real2D::Block;
 using Real2D::AirBlock;
 using Real2D::block_t;
 using Real2D::Blocks;
 using Real2D::AABBox;
+using Real2D::Registry;
+using Real2D::Registries;
 
-Block::Block(const int _id) : id(_id) {}
-int Block::getId() {
-    return id;
+Registry<block_t>* Registries::BLOCK = new Registry(&Blocks::AIR);
+
+Block::Block() {}
+int Block::getId() const {
+    return Registries::BLOCK->get(const_cast<Block*>(this));
 }
 bool Block::operator==(const Block& block_) const {
-    return id == block_.id;
+    return getId() == block_.getId();
 }
 bool Block::operator!=(const Block& block_) const {
-    return id != block_.id;
+    return getId() != block_.getId();
 }
 AABBox* Block::getOutline() {
     return (AABBox*)&AABBox::FULL_CUBE;
@@ -26,7 +32,6 @@ AABBox* Block::getCollision() {
     return getOutline();
 }
 
-AirBlock::AirBlock(const int _id) : Block::Block(_id) {}
 AABBox* AirBlock::getCollision() {
     return nullptr;
 }
@@ -51,9 +56,15 @@ void BlockStates::setBlock(const Block& block_) {
     block = &block_;
 }*/
 
-block_t Blocks::AIR = new AirBlock(0);
-block_t Blocks::GRASS_BLOCK = new Block(1);
-block_t Blocks::STONE = new Block(2);
+template<typename T>
+block_t reg(int rawId, string id, T block) {
+    return Registries::BLOCK->set(rawId, id, block);
+}
+
+block_t Blocks::AIR = reg(0, "air_block", new AirBlock());
+block_t Blocks::GRASS_BLOCK = reg(1, "grass_block", new Block());
+block_t Blocks::STONE = reg(2, "stone", new Block());
+
 void Real2D::renderBlock(int x, int y, int z, block_t block) {
     GLfloat xi = (GLfloat)UNML(x);
     GLfloat xi1 = (GLfloat)UNML(x + 1);

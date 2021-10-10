@@ -6,11 +6,11 @@
 #include "real2d/real2d_def_c.h"
 #include <cmath>
 
+using std::vector;
 using Real2D::Player;
 using Real2D::Window;
 using Real2D::AABBox;
 using Real2D::block_t;
-using std::vector;
 
 float headXRot = 0.0f;
 float yRot = 0.0f;
@@ -28,7 +28,12 @@ Player::Player(World* _world) :
     world(_world),
     x(16.0f), y(9.0f), z(1.0f),
     prev_x(x), prev_y(y),
-    bb(AABBox(x - 0.3f, y, z, x + 0.3f, y + bb_height, z + 1)),
+    bb(AABBox(x - 0.3f,
+        y,
+        z,
+        x + 0.3f,
+        y + bb_height,
+        z + 1)),
     onGround(false)
 {}
 void Player::tick() {
@@ -48,11 +53,17 @@ void Player::tick() {
     if (isKeyDown(GLFW_KEY_D)) {
         ++xa;
     }
-    move(xa, ya, onGround ? 0.02f : 0.03f);
+    move(xa, ya, onGround ? 0.03f : 0.04f);
+    bb.set(x - 0.3f,
+        y,
+        z,
+        x + 0.3f,
+        y + bb_height,
+        z + 1);
     headXRot = Window::mouseY - Window::height * 0.5f;
     yRot = Window::mouseX - Window::width * 0.5f;
-    if (headXRot < -45) {
-        headXRot = -45;
+    if (headXRot < -90) {
+        headXRot = -90;
     }
     if (headXRot > 90) {
         headXRot = 90;
@@ -79,6 +90,7 @@ void Player::move(float xa, float ya, float speed) {
                 break;
             }
         }
+        x += xd;
     }
     if (yd != 0) {
         for (auto c : cubes) {
@@ -88,32 +100,21 @@ void Player::move(float xa, float ya, float speed) {
                 break;
             }
         }
+        onGround = ydOrg != yd && ydOrg < 0;
+        y += yd;
     }
-    float ox = x;
-    float oy = y;
 
-    onGround = ydOrg != yd && ydOrg < 0.0f;
-    x += xd;
-    y += yd;
-
-    float fxd = xd;
-    float fyd = yd;
 
     // round (the earth is a ball)
     if (x < 0) {
         x = WORLD_W;
-        fxd = x - ox;
     }
     if (x > WORLD_W) {
         x = 0;
-        fxd = x - ox;
     }
     if (y < -5) {
         y = -5;
-        fyd = 0;
     }
-
-    bb.move(fxd, fyd, 0);
 }
 void Player::render(double delta) {
     glPushMatrix();

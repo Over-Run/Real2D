@@ -1,17 +1,18 @@
 #pragma once
-#include "glad/gl.h"
 #include "block.h"
+#include "glad/gl.h"
 #include <vector>
 
 extern Real2D::block_t choosingBlock;
-
 extern int selectz;
 
 namespace Real2D {
+    class Player;
     class World {
     public:
         int version;
         block_t* world;
+        Player* player;
         bool is_dirty;
 
         World();
@@ -26,7 +27,7 @@ namespace Real2D {
         bool isDirty();
         block_t& getBlock(int x, int y, int z);
         void setBlock(int x, int y, int z, block_t block);
-        void load();
         void save();
+        bool load();
     };
 }

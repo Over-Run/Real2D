@@ -6,7 +6,8 @@ extern float headYRot;
 
 namespace Real2D {
     class World;
-    struct Player {
+    class Player {
+    public:
         const float bb_width;
         const float bb_height;
         World* world;
@@ -21,5 +22,3 @@ namespace Real2D {
         void render(double delta);
     };
 }
-
-extern Real2D::Player* player;

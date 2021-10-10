@@ -17,4 +17,4 @@ g++ ${target[*]} \
 $1 \
 -Iinclude -Llib/x64 -std=c++17 \
 -lglad2 -lglfw3 -ldl -lX11 -lpthread \
--o x64/Linux/Real2D.out
+-o x64/Linux/Real2D.exe

@@ -7,6 +7,7 @@ New feature: Player 3D model
 New feature: Collision box
 New feature: Split client
 New feature: Save the world
+New feature: Simple registry system
 
 0.2.0
 New feature: main.cpp objective

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -174,6 +174,7 @@
     <ClCompile Include="src\aabb.cpp" />
     <ClCompile Include="src\block.cpp" />
     <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\hit.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\packet.cpp" />
@@ -189,11 +190,13 @@
     <ClInclude Include="include\real2d\aabb.h" />
     <ClInclude Include="include\real2d\block.h" />
     <ClInclude Include="include\real2d\client.h" />
+    <ClInclude Include="include\real2d\files.h" />
     <ClInclude Include="include\real2d\hit.h" />
     <ClInclude Include="include\real2d\packet.h" />
     <ClInclude Include="include\real2d\player.h" />
     <ClInclude Include="include\real2d\real2d_def.h" />
     <ClInclude Include="include\real2d\real2d_def_c.h" />
+    <ClInclude Include="include\real2d\reg.h" />
     <ClInclude Include="include\real2d\rmath.h" />
     <ClInclude Include="include\real2d\stb_c.h" />
     <ClInclude Include="include\real2d\texmgr_c.h" />
