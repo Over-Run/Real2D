@@ -26,14 +26,16 @@ void loadTexture() {
     blocks = texmgr.loadTexture(TEX_BLOCKS);
 }
 
-const char* appendTitle(int count, ...) {
-    char* c = new char[80];
+char* appendTitle(int count, ...) {
+    static char c[80];
     memset(c, 0, 80);
     va_list valist;
     va_start(valist, count);
 #if defined(_MSC_VER) && _MSC_VER >= 1400
+    strcat_s(c, 80, "Real2D ");
     strcat_s(c, 80, GAME_VER);
 #else
+    strcat(c, "Real2D ");
     strcat(c, GAME_VER);
 #endif
     for (int i = 0; i < count; ++i) {
@@ -56,7 +58,6 @@ void Client::start() {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     auto c = appendTitle(0);
     window = glfwCreateWindow(DEF_W, DEF_H, c, nullptr, nullptr);
-    delete[] c;
     if (window == nullptr) {
         glfwTerminate();
         throw "Unable to create GLFW window";
@@ -126,7 +127,6 @@ void Client::run() {
 #endif
             auto c = appendTitle(1, s);
             glfwSetWindowTitle(window, c);
-            delete[] c;
             lastTime += 1000;
             frames = 0;
         }
