@@ -14,11 +14,13 @@ namespace Real2D {
         /// </summary>
         /// <returns>The raw id.</returns>
         int getId() const;
+        virtual bool shading();
         virtual AABBox* getOutline();
         virtual AABBox* getCollision();
     };
     class AirBlock : public Block {
     public:
+        virtual bool shading();
         virtual AABBox* getCollision();
     };
 

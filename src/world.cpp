@@ -7,7 +7,6 @@
 #include "real2d/real2d_def_c.h"
 #include "real2d/reg.h"
 #include "real2d/files.h"
-#include <fstream>
 
 #define WORLD_BLOCK_I(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
 
@@ -42,15 +41,20 @@ World::World() :
     version(WORLD_VER),
     world(new block_t[WORLD_SIZE]),
     player(new Player(this)),
-    is_dirty(true) {}
+    is_dirty(true) {
+    if (world == nullptr) {
+        throw "Unable to create world";
+    }
+    if (player == nullptr) {
+        throw "Unable to create player";
+    }
+}
 World::~World() {
     save();
-    if (world != nullptr) {
-        delete[] world;
-    }
-    if (player != nullptr) {
-        delete player;
-    }
+    delete[] world;
+    world = nullptr;
+    delete player;
+    player = nullptr;
     if (glDeleteLists) {
         glDeleteLists(list, 1);
     }
@@ -254,18 +258,6 @@ void World::setBlock(int x, int y, int z, block_t block) {
     }
 }
 
-void stream_write(ofstream& os, int* i) {
-    os.write((char*)i, sizeof(int));
-}
-void stream_write(ofstream& os, float* i) {
-    os.write((char*)i, sizeof(float));
-}
-void stream_read(ifstream& is, int* i) {
-    is.read((char*)i, sizeof(int));
-}
-void stream_read(ifstream& is, float* i) {
-    is.read((char*)i, sizeof(float));
-}
 void World::save() {
     createDir("saves/");
     ofstream level;

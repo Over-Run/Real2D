@@ -203,6 +203,7 @@
     <ClInclude Include="include\real2d\timer.h" />
     <ClInclude Include="include\real2d\window_c.h" />
     <ClInclude Include="include\real2d\world.h" />
+    <ClInclude Include="include\real2d\world_c.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\res.rc" />

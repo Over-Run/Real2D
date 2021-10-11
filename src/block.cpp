@@ -25,6 +25,9 @@ bool Block::operator==(const Block& block_) const {
 bool Block::operator!=(const Block& block_) const {
     return getId() != block_.getId();
 }
+bool Block::shading() {
+    return true;
+}
 AABBox* Block::getOutline() {
     return (AABBox*)&AABBox::FULL_CUBE;
 }
@@ -32,6 +35,9 @@ AABBox* Block::getCollision() {
     return getOutline();
 }
 
+bool AirBlock::shading() {
+    return false;
+}
 AABBox* AirBlock::getCollision() {
     return nullptr;
 }

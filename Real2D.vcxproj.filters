@@ -125,6 +125,9 @@
     <ClInclude Include="include\real2d\files.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="include\real2d\world_c.h">
+      <Filter>Headers\World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\res.rc">

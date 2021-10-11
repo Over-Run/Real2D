@@ -8,12 +8,14 @@ extern int selectz;
 
 namespace Real2D {
     class Player;
+    class WorldListener {};
     class World {
     public:
         int version;
         block_t* world;
         Player* player;
         bool is_dirty;
+        std::vector<WorldListener*> listeners;
 
         World();
         ~World();
@@ -22,6 +24,7 @@ namespace Real2D {
         void select();
         void renderSelect(double delta);
         void tick();
+        void addListener(WorldListener* listener);
         std::vector<AABBox> getCubes(AABBox box);
         void markDirty();
         bool isDirty();
