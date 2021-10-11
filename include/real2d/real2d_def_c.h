@@ -7,8 +7,8 @@ constexpr auto WORLD_RENDER_NML = 32.0f;
 
 // player
 constexpr const char* TEX_PLAYER = "res/player.png";
-constexpr float TEX_PLAYER_W = 48.0f;
-constexpr float TEX_PLAYER_H = 64.0f;
+constexpr auto TEX_PLAYER_W = 48.0f;
+constexpr auto TEX_PLAYER_H = 64.0f;
 
 // client
 constexpr auto GAME_VER = "0.3.0";
