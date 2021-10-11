@@ -46,7 +46,7 @@ World::World() :
 World::~World() {
     save();
     if (world != nullptr) {
-        delete world;
+        delete[] world;
     }
     if (player != nullptr) {
         delete player;
