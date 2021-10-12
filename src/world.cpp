@@ -7,13 +7,17 @@
 #include "real2d/real2d_def_c.h"
 #include "real2d/reg.h"
 #include "real2d/files.h"
+#include <sstream>
 
 #define WORLD_BLOCK_I(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
 
 using std::ifstream;
+using std::ostream;
 using std::ofstream;
+using std::iostream;
 using std::ios;
 using std::endl;
+using std::vector;
 using Real2D::Window;
 using Real2D::block_t;
 using Real2D::Blocks;
@@ -47,6 +51,9 @@ World::World() :
     }
     if (player == nullptr) {
         throw "Unable to create player";
+    }
+    for (size_t i = 0; i < WORLD_SIZE; ++i) {
+        world[i] = AIR_BLOCK;
     }
 }
 World::~World() {
@@ -200,8 +207,8 @@ void World::tick() {
     player->tick();
 }
 
-std::vector<AABBox> World::getCubes(AABBox box) {
-    std::vector<AABBox> cubes;
+vector<AABBox> World::getCubes(AABBox box) {
+    vector<AABBox> cubes;
     int x0 = (int)box.start_x;
     int x1 = (int)(box.end_x + 1);
     int y0 = (int)box.start_y;
@@ -266,9 +273,33 @@ void World::save() {
         throw "Couldn't open level.dat";
     }
     stream_write(level, &version);
-    for (size_t i = 0; i < WORLD_SIZE; ++i) {
-        int id = world[i]->getId();
-        stream_write(level, &id);
+    int blockBs = 0;
+    byte blockId = 0;
+    int dict_len = 0;
+    bool init = false;
+    vector<int> buf_iv;
+    vector<byte> buf_bv;
+    for (int i = 0; i < WORLD_SIZE; ++i) {
+        byte id = (byte)world[i]->getId();;
+        if (init) {
+            if (id != blockId) {
+                buf_iv.push_back(blockBs);
+                buf_bv.push_back(blockId);
+                blockBs = 0;
+                blockId = id;
+                ++dict_len;
+            }
+        }
+        else {
+            blockId = id;
+        }
+        ++blockBs;
+        init = true;
+    }
+    stream_write(level, &dict_len);
+    for (int i = 0; i < dict_len; ++i) {
+        stream_write(level, &buf_iv[i]);
+        stream_write(level, &buf_bv[i]);
     }
     stream_write(level, &player->x);
     stream_write(level, &player->y);
@@ -283,12 +314,30 @@ bool World::load() {
         return false;
     }
     stream_read(level, &version);
-    if (version >= 1 && version <= 1) {
-        for (size_t i = 0; i < WORLD_SIZE; ++i) {
-            int id;
-            stream_read(level, &id);
-            world[i] = Registries::BLOCK->get(id);
+    if (1 == version) {
+        int dict_len;
+        int offset = 0;
+        stream_read(level, &dict_len);
+        for (int i = 0; i < dict_len; ++i) {
+            int blockBs;
+            byte blockId;
+            stream_read(level, &blockBs);
+            stream_read(level, &blockId);
+            for (int j = 0; j < blockBs; ++j) {
+                world[j + offset] = Registries::BLOCK->get(blockId);
+            }
+            offset += blockBs;
         }
+        //for (size_t i = 0; i < WORLD_SIZE; ) {
+        /*int i = 0;
+            stream_read(level, &blockBs);
+            stream_read(level, &blockId);
+            for (int j = 0; j < blockBs; ++j) {
+                world[i] = Registries::BLOCK->get(blockId);
+                ++i;
+            }*/
+            //world[i] = Registries::BLOCK->get(id);
+        //}
         stream_read(level, &player->x);
         stream_read(level, &player->y);
         stream_read(level, &player->z);
