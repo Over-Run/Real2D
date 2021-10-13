@@ -10,6 +10,7 @@ namespace Real2D {
         GLuint lastId;
         GLuint loadTexture(std::string img);
         void bindTexture(GLuint id);
+        void bindTexture(std::string img);
     };
 }
 

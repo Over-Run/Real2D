@@ -44,8 +44,8 @@ GLuint TexMgr::loadTexture(string img) {
     return id;
 }
 void TexMgr::bindTexture(GLuint id) {
-    if (lastId != id) {
-        glBindTexture(GL_TEXTURE_2D, id);
-        lastId = id;
-    }
+    glBindTexture(GL_TEXTURE_2D, id);
+}
+void TexMgr::bindTexture(string img) {
+    bindTexture(loadTexture(img));
 }

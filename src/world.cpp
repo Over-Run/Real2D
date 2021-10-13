@@ -7,17 +7,17 @@
 #include "real2d/real2d_def_c.h"
 #include "real2d/reg.h"
 #include "real2d/files.h"
-#include <sstream>
+#include <map>
 
 #define WORLD_BLOCK_I(x,y,z) (x + y * WORLD_W + z * WORLD_W * WORLD_H)
 
 using std::ifstream;
-using std::ostream;
 using std::ofstream;
-using std::iostream;
 using std::ios;
 using std::endl;
 using std::vector;
+using std::map;
+using std::string;
 using Real2D::Window;
 using Real2D::block_t;
 using Real2D::Blocks;
@@ -52,7 +52,7 @@ World::World() :
     if (player == nullptr) {
         throw "Unable to create player";
     }
-    for (size_t i = 0; i < WORLD_SIZE; ++i) {
+    for (int i = 0; i < WORLD_SIZE; ++i) {
         world[i] = AIR_BLOCK;
     }
 }
@@ -71,20 +71,18 @@ void World::create() {
         for (int z = 0; z < WORLD_D; ++z) {
             for (int x = 0; x < WORLD_W; ++x) {
                 for (int y = 0; y < WORLD_H; ++y) {
-                    block_t b;
+                    block_t b = AIR_BLOCK;
                     if (y < 3) {
                         b = BLOCK(STONE);
                     }
                     else if (y == 3) {
                         b = BLOCK(GRASS_BLOCK);
                     }
-                    else {
-                        b = AIR_BLOCK;
-                    }
                     setBlock(x, y, z, b);
                 }
             }
         }
+        save();
     }
     list = glGenLists(1);
 }
@@ -273,34 +271,25 @@ void World::save() {
         throw "Couldn't open level.dat";
     }
     stream_write(level, &version);
-    int blockBs = 0;
-    byte blockId = 0;
-    int dict_len = 0;
-    bool init = false;
-    vector<int> buf_iv;
-    vector<byte> buf_bv;
+
+    stream_write(level, &WORLD_SIZE);
+
+    int regsz = Registries::BLOCK->size();
+    stream_write(level, &regsz);
+    for (auto& e : Registries::BLOCK->rawIds()) {
+        int& sec = e.second;
+        string s = Registries::BLOCK->getSID(sec);
+        int sz = (int)s.size() + 1;
+        stream_write(level, &sec);
+        stream_write(level, &sz);
+        stream_write(level, s);
+    }
+
     for (int i = 0; i < WORLD_SIZE; ++i) {
-        byte id = (byte)world[i]->getId();;
-        if (init) {
-            if (id != blockId) {
-                buf_iv.push_back(blockBs);
-                buf_bv.push_back(blockId);
-                blockBs = 0;
-                blockId = id;
-                ++dict_len;
-            }
-        }
-        else {
-            blockId = id;
-        }
-        ++blockBs;
-        init = true;
+        int id = Registries::BLOCK->get(world[i]);
+        stream_write(level, &id);
     }
-    stream_write(level, &dict_len);
-    for (int i = 0; i < dict_len; ++i) {
-        stream_write(level, &buf_iv[i]);
-        stream_write(level, &buf_bv[i]);
-    }
+
     stream_write(level, &player->x);
     stream_write(level, &player->y);
     stream_write(level, &player->z);
@@ -314,30 +303,33 @@ bool World::load() {
         return false;
     }
     stream_read(level, &version);
+    int wrdsz;
+    stream_read(level, &wrdsz);
+
+    if (wrdsz > WORLD_SIZE) {
+        wrdsz = WORLD_SIZE;
+    }
+
     if (1 == version) {
-        int dict_len;
-        int offset = 0;
-        stream_read(level, &dict_len);
-        for (int i = 0; i < dict_len; ++i) {
-            int blockBs;
-            byte blockId;
-            stream_read(level, &blockBs);
-            stream_read(level, &blockId);
-            for (int j = 0; j < blockBs; ++j) {
-                world[j + offset] = Registries::BLOCK->get(blockId);
-            }
-            offset += blockBs;
+        map<int, string> id_map;
+        int regsz;
+        stream_read(level, &regsz);
+        for (int i = 0; i < regsz; ++i) {
+            int rawId;
+            int psz;
+            string id;
+            stream_read(level, &rawId);
+            stream_read(level, &psz);
+            stream_read(level, psz, &id);
+            id_map[rawId] = id;
         }
-        //for (size_t i = 0; i < WORLD_SIZE; ) {
-        /*int i = 0;
-            stream_read(level, &blockBs);
-            stream_read(level, &blockId);
-            for (int j = 0; j < blockBs; ++j) {
-                world[i] = Registries::BLOCK->get(blockId);
-                ++i;
-            }*/
-            //world[i] = Registries::BLOCK->get(id);
-        //}
+
+        for (int i = 0; i < wrdsz; ++i) {
+            int id;
+            stream_read(level, &id);
+            world[i] = Registries::BLOCK->get(id_map[id]);
+        }
+
         stream_read(level, &player->x);
         stream_read(level, &player->y);
         stream_read(level, &player->z);

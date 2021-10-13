@@ -31,7 +31,7 @@ char* appendTitle(int count, ...) {
     memset(c, 0, 80);
     va_list valist;
     va_start(valist, count);
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifdef MSVC8
     strcat_s(c, 80, "Real2D ");
     strcat_s(c, 80, GAME_VER);
 #else
@@ -39,7 +39,7 @@ char* appendTitle(int count, ...) {
     strcat(c, GAME_VER);
 #endif
     for (int i = 0; i < count; ++i) {
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifdef MSVC8
         strcat_s(c, 80,
 #else
         strcat(c,
@@ -120,7 +120,7 @@ void Client::run() {
         ++frames;
         while (glfwGetTime() * 1000 >= lastTime + 1000LL) {
             char s[32];
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifdef MSVC8
             sprintf_s(s, 32, " FPS: %d", frames);
 #else
             sprintf(s, " FPS: %d", frames);
