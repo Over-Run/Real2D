@@ -1,5 +1,6 @@
 #include "real2d/files.h"
 #include "real2d/real2d_def.h"
+#include <cstring>
 #include <filesystem>
 
 using std::string;
