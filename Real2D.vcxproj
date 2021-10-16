@@ -1,14 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug-Linux|Win32">
-      <Configuration>Debug-Linux</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug-Linux|x64">
-      <Configuration>Debug-Linux</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -61,12 +53,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug-Linux|Win32'">
-    <PlatformToolset>v142</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug-Linux|x64'">
-    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -184,36 +170,40 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Linux|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>gl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Linux|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>gl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\aabb.cpp" />
     <ClCompile Include="src\block.cpp" />
+    <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\files.cpp" />
+    <ClCompile Include="src\hit.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\packet.cpp" />
     <ClCompile Include="src\player.cpp" />
-    <ClCompile Include="src\stb.cpp" />
-    <ClCompile Include="src\texmgr.cpp" />
+    <ClCompile Include="src\rmath.cpp" />
+    <ClCompile Include="src\stb_c.cpp" />
+    <ClCompile Include="src\texmgr_c.cpp" />
     <ClCompile Include="src\timer.cpp" />
+    <ClCompile Include="src\window_c.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\real2d\aabb.h" />
     <ClInclude Include="include\real2d\block.h" />
+    <ClInclude Include="include\real2d\client.h" />
+    <ClInclude Include="include\real2d\files.h" />
+    <ClInclude Include="include\real2d\hit.h" />
+    <ClInclude Include="include\real2d\packet.h" />
     <ClInclude Include="include\real2d\player.h" />
-    <ClInclude Include="include\real2d\stb.h" />
-    <ClInclude Include="include\real2d\texmgr.h" />
+    <ClInclude Include="include\real2d\real2d_def.h" />
+    <ClInclude Include="include\real2d\real2d_def_c.h" />
+    <ClInclude Include="include\real2d\reg.h" />
+    <ClInclude Include="include\real2d\rmath.h" />
+    <ClInclude Include="include\real2d\stb_c.h" />
+    <ClInclude Include="include\real2d\texmgr_c.h" />
     <ClInclude Include="include\real2d\timer.h" />
+    <ClInclude Include="include\real2d\window_c.h" />
+    <ClInclude Include="include\real2d\world.h" />
+    <ClInclude Include="include\real2d\world_c.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\res.rc" />

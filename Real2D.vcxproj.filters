@@ -13,12 +13,27 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Headers\Client">
+      <UniqueIdentifier>{cd9043ea-e33c-44a9-ae40-13004585dfe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Client">
+      <UniqueIdentifier>{30cd85e2-0000-4ed7-b26e-ea3b4a3adda7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Server">
+      <UniqueIdentifier>{1baa8ac5-d222-471d-89bf-3bf1f2bf7419}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\World">
+      <UniqueIdentifier>{a1c86ea0-94d1-4187-a429-43de7bcab691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\World">
+      <UniqueIdentifier>{b4dc9516-f3bc-4e7d-bb4e-15f7c7932aa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Server">
+      <UniqueIdentifier>{012ab1f8-eb62-4ef2-86e4-cbb03d97c461}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stb.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="src\block.cpp">
@@ -27,28 +42,91 @@
     <ClCompile Include="src\timer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\player.cpp">
+    <ClCompile Include="src\rmath.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\texmgr.cpp">
+    <ClCompile Include="src\aabb.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hit.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window_c.cpp">
+      <Filter>Sources\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texmgr_c.cpp">
+      <Filter>Sources\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stb_c.cpp">
+      <Filter>Sources\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client.cpp">
+      <Filter>Sources\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Sources\World</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world.cpp">
+      <Filter>Sources\World</Filter>
+    </ClCompile>
+    <ClCompile Include="src\packet.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\files.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\real2d\stb.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\real2d\block.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\real2d\timer.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\real2d\player.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\real2d\texmgr.h">
+    <ClInclude Include="include\real2d\rmath.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\aabb.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\hit.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\real2d_def.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\client.h">
+      <Filter>Headers\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\texmgr_c.h">
+      <Filter>Headers\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\window_c.h">
+      <Filter>Headers\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\stb_c.h">
+      <Filter>Headers\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\real2d_def_c.h">
+      <Filter>Headers\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\block.h">
+      <Filter>Headers\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\world.h">
+      <Filter>Headers\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\packet.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\reg.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\files.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\world_c.h">
+      <Filter>Headers\World</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

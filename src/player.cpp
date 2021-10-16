@@ -1,282 +1,321 @@
 #include "real2d/player.h"
-#include "real2d/texmgr.h"
-#include "GLFW/glfw3.h"
+#include "real2d/texmgr_c.h"
+#include "real2d/window_c.h"
+#include "real2d/block.h"
+#include "real2d/world.h"
+#include "real2d/real2d_def_c.h"
+#include <cmath>
 
+using std::vector;
 using Real2D::Player;
+using Real2D::Window;
+using Real2D::AABBox;
+using Real2D::block_t;
 
-Player player;
+float headXRot = 0.0f;
+float yRot = 0.0f;
 
-extern bool isKeyDown(int key);
-extern int width;
-extern int height;
+extern block_t choosingBlock;
+extern GLuint blocks;
 
-Player::Player() :
-    x(16), y(5), z(1), height(2), basestep(0.05f), rotate(1)
+inline bool isKeyDown(int key) {
+    return Window::isKeyDown(key);
+}
+
+Player::Player(World* _world) :
+    bb_width(0.6f),
+    bb_height(1.8f),
+    world(_world),
+    x(16.0f), y(9.0f), z(1.0f),
+    prev_x(x), prev_y(y),
+    bb(AABBox(x - 0.3f,
+        y,
+        z,
+        x + 0.3f,
+        y + bb_height,
+        z + 1)),
+    onGround(false)
 {}
-void Player::tick(double delta) {
-    int xo = 0, yo = 0, zo = 0;
-    if (isKeyDown(GLFW_KEY_W)) {
-        --zo;
-        rotate = PLAYER_ROT_B;
+void Player::tick() {
+    prev_x = x;
+    prev_y = y;
+    float xa = 0;
+    float ya = 0;
+    if (isKeyDown(GLFW_KEY_SPACE) || isKeyDown(GLFW_KEY_W)) {
+        ++ya;
     }
-    if (isKeyDown(GLFW_KEY_S)) {
-        ++zo;
-        rotate = PLAYER_ROT_F;
-    }
-    if (isKeyDown(GLFW_KEY_SPACE)) {
-        ++yo;
-    }
-    if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-        --yo;
+    if (isKeyDown(GLFW_KEY_LEFT_SHIFT) || isKeyDown(GLFW_KEY_S)) {
+        --ya;
     }
     if (isKeyDown(GLFW_KEY_A)) {
-        --xo;
-        rotate = PLAYER_ROT_L;
+        --xa;
     }
     if (isKeyDown(GLFW_KEY_D)) {
-        ++xo;
-        rotate = PLAYER_ROT_R;
+        ++xa;
     }
-    moveRelative((float)(xo * delta),
-        (float)(yo * delta),
-        (float)(zo * delta));
+    move(xa, ya, onGround ? 0.03f : 0.04f);
+    bb.set(x - 0.3f,
+        y,
+        z,
+        x + 0.3f,
+        y + bb_height,
+        z + 1);
+    headXRot = Window::mouseY - Window::height * 0.5f;
+    yRot = Window::mouseX - Window::width * 0.5f;
+    if (headXRot < -90) {
+        headXRot = -90;
+    }
+    if (headXRot > 90) {
+        headXRot = 90;
+    }
+    if (yRot < -90) {
+        yRot = -90;
+    }
+    if (yRot > 90) {
+        yRot = 90;
+    }
 }
-void Player::moveRelative(float xom, float yom, float zom) {
-    x += basestep * xom;
-    y += basestep * yom;
-    z += basestep * zom;
+void Player::move(float xa, float ya, float speed) {
+    float xd = xa * speed;
+    float yd = ya * speed;
+    float ydOrg = yd;
+    vector<AABBox> cubes = world->getCubes(bb.expand(xd, yd, 0));
+    AABBox copybb;
+    copybb.set(bb);
+    if (xd != 0) {
+        for (auto c : cubes) {
+            bb.move(xd, 0, 0, &copybb);
+            if (c.isIntersect(copybb)) {
+                xd = 0;
+                break;
+            }
+        }
+        x += xd;
+    }
+    if (yd != 0) {
+        for (auto c : cubes) {
+            bb.move(0, yd, 0, &copybb);
+            if (c.isIntersect(copybb)) {
+                yd = 0;
+                break;
+            }
+        }
+        onGround = ydOrg != yd && ydOrg < 0;
+        y += yd;
+    }
+
 
     // round (the earth is a ball)
-    if (z < -1) {
-        z = 1;
+    if (x < 0) {
+        x = WORLD_W;
     }
-    if (z > 1) {
-        z = -1;
+    if (x > WORLD_W) {
+        x = 0;
+    }
+    if (y < -5) {
+        y = -5;
     }
 }
-void Player::render() {
+void Player::render(double delta) {
     glPushMatrix();
-    glTranslatef((GLfloat)(width >> 1), (GLfloat)(::height >> 1), 0);
+    glTranslatef(Window::width * 0.5f, Window::height * 0.5f, 20.125f);
     GLuint id = texmgr.loadTexture(TEX_PLAYER);
-    GLfloat u0;
-    GLfloat u1;
-    GLfloat v0;
-    GLfloat v1;
-    const GLfloat v2 = 8 / TEX_PLAYER_H;
-    const GLfloat v3 = 20 / TEX_PLAYER_H;
-    const GLfloat v4 = 32 / TEX_PLAYER_H;
-    const GLfloat v5 = 44 / TEX_PLAYER_H;
-    glBindTexture(GL_TEXTURE_2D, id);
+
+    const GLfloat u0 = 0;
+    const GLfloat u4 = 4 / TEX_PLAYER_W;
+    const GLfloat u8 = 8 / TEX_PLAYER_W;
+    const GLfloat u12 = 12 / TEX_PLAYER_W;
+    const GLfloat u16 = 16 / TEX_PLAYER_W;
+    const GLfloat u20 = 20 / TEX_PLAYER_W;
+    const GLfloat u24 = 24 / TEX_PLAYER_W;
+    const GLfloat u28 = 28 / TEX_PLAYER_W;
+    const GLfloat u32 = 32 / TEX_PLAYER_W;
+    const GLfloat u36 = 36 / TEX_PLAYER_W;
+    const GLfloat u40 = 40 / TEX_PLAYER_W;
+    const GLfloat v0 = 0;
+    const GLfloat v8 = 8 / TEX_PLAYER_H;
+    const GLfloat v16 = 16 / TEX_PLAYER_H;
+    const GLfloat v28 = 28 / TEX_PLAYER_H;
+    const GLfloat v40 = 40 / TEX_PLAYER_H;
+    const GLfloat v52 = 52 / TEX_PLAYER_H;
+
     glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_QUADS);
-
-    GLfloat hf = 8 / TEX_PLAYER_W;
-    GLfloat vx = height - 16;
-    GLfloat vy = height;
-
+    texmgr.bindTexture(id);
     // Head
-    u0 = rotate * hf;
-    u1 = (rotate + 1) * hf;
-    v0 = 0;
-    v1 = v2;
-    glTexCoord2f(u0, v1); glVertex3f(-8, vx, z);
-    glTexCoord2f(u1, v1); glVertex3f(8, vx, z);
-    glTexCoord2f(u1, v0); glVertex3f(8, vy, z);
-    glTexCoord2f(u0, v0); glVertex3f(-8, vy, z);
-    // end head
-    // Body
-    v0 = v2;
-    v1 = v3;
-    vx = height - 40;
-    vy = height - 16;
-    hf = (GLfloat)(rotate / 2 * 12);
-    if (rotate == PLAYER_ROT_F
-        || rotate == PLAYER_ROT_B) {
-        u0 = (20 + hf) / TEX_PLAYER_W;
-        u1 = (28 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-8, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(8, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(8, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-8, vy, z);
-    }
-    else {
-        u0 = (16 + hf) / TEX_PLAYER_W;
-        u1 = (20 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(4, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-4, vy, z);
-    }
-    // end body
-    // Arms
-    hf = (GLfloat)(rotate / 2 * 8);
-    if (rotate == PLAYER_ROT_F
-        || rotate == PLAYER_ROT_B) {
-        // right arm
-        u0 = (44 + hf) / TEX_PLAYER_W;
-        u1 = (48 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-16, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(-8, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(-8, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-16, vy, z);
-        // left arm
-        v0 = v4;
-        v1 = v5;
-        u0 = (36 + hf) / TEX_PLAYER_W;
-        u1 = (40 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(16, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(8, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(8, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(16, vy, z);
-    }
-    else if (rotate == PLAYER_ROT_R) {
-        // right arm
-        u0 = (40 + hf) / TEX_PLAYER_W;
-        u1 = (44 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(4, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-4, vy, z);
-    }
-    else if (rotate == PLAYER_ROT_L) {
-        // left arm
-        v0 = v4;
-        v1 = v5;
-        u0 = (32 + hf) / TEX_PLAYER_W;
-        u1 = (36 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(4, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-4, vy, z);
-    }
-    // end arms
-    // Legs
-    v0 = v2;
-    v1 = v3;
-    vx = height - 64;
-    vy = height - 40;
-    hf = (GLfloat)(rotate / 2 * 8);
-    if (rotate == PLAYER_ROT_F
-        || rotate == PLAYER_ROT_B) {
-        // right leg
-        u0 = (4 + hf) / TEX_PLAYER_W;
-        u1 = (8 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-8, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(0, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(0, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-8, vy, z);
-        // left leg
-        v0 = v4;
-        v1 = v5;
-        u0 = (20 + hf) / TEX_PLAYER_W;
-        u1 = (24 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(8, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(0, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(0, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(8, vy, z);
-    }
-    else if (rotate == PLAYER_ROT_R) {
-        // right leg
-        u0 = (4 + hf) / TEX_PLAYER_W;
-        u1 = (8 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(4, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-4, vy, z);
-    }
-    else if (rotate == PLAYER_ROT_L) {
-        // left leg
-        v0 = v4;
-        v1 = v5;
-        u0 = (20 + hf) / TEX_PLAYER_W;
-        u1 = (24 + hf) / TEX_PLAYER_W;
-        glTexCoord2f(u0, v1); glVertex3f(-4, vx, z);
-        glTexCoord2f(u1, v1); glVertex3f(4, vx, z);
-        glTexCoord2f(u1, v0); glVertex3f(4, vy, z);
-        glTexCoord2f(u0, v0); glVertex3f(-4, vy, z);
-    }
-    // end legs
-
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Shadow
-    glColor4f(0.0f, 0.0f, 0.0f, (1 - z) / 4);
+    glPushMatrix();
+    glTranslatef(0, 48, -8);
+    glRotatef(headXRot, 1, 0, 0);
+    glRotatef(yRot, 0, 1, 0);
+    glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
     glBegin(GL_QUADS);
+    // front
+    glTexCoord2f(u8, v8); glVertex3f(-0.25f, 0.5f, 0.25f);
+    glTexCoord2f(u8, v16); glVertex3f(-0.25f, 0, 0.25f);
+    glTexCoord2f(u16, v16); glVertex3f(0.25f, 0, 0.25f);
+    glTexCoord2f(u16, v8); glVertex3f(0.25f, 0.5f, 0.25f);
+    // left
+    glTexCoord2f(u0, v8); glVertex3f(-0.25f, 0.5f, -0.25f);
+    glTexCoord2f(u0, v16); glVertex3f(-0.25f, 0, -0.25f);
+    glTexCoord2f(u8, v16); glVertex3f(-0.25f, 0, 0.25f);
+    glTexCoord2f(u8, v8); glVertex3f(-0.25f, 0.5f, 0.25f);
+    // right
+    glTexCoord2f(u16, v8); glVertex3f(0.25f, 0.5f, 0.25f);
+    glTexCoord2f(u16, v16); glVertex3f(0.25f, 0, 0.25f);
+    glTexCoord2f(u24, v16); glVertex3f(0.25f, 0, -0.25f);
+    glTexCoord2f(u24, v8); glVertex3f(0.25f, 0.5f, -0.25f);
+    // top
+    glTexCoord2f(u8, v0); glVertex3f(-0.25f, 0.5f, 0.25f);
+    glTexCoord2f(u8, v8); glVertex3f(-0.25f, 0.5f, -0.25f);
+    glTexCoord2f(u16, v8); glVertex3f(0.25f, 0.5f, -0.25f);
+    glTexCoord2f(u16, v0); glVertex3f(0.25f, 0.5f, 0.25f);
+    // bottom
+    glTexCoord2f(u16, v0); glVertex3f(-0.25f, 0, 0.25f);
+    glTexCoord2f(u16, v8); glVertex3f(-0.25f, 0, -0.25f);
+    glTexCoord2f(u24, v8); glVertex3f(0.25f, 0, -0.25f);
+    glTexCoord2f(u24, v0); glVertex3f(0.25f, 0, 0.25f);
+    glEnd();
+    glPopMatrix();
 
     // Body
-    vx = height - 40;
-    vy = height - 16;
-    if (rotate == PLAYER_ROT_F
-        || rotate == PLAYER_ROT_B) {
-        glVertex3f(-8, vx, z);
-        glVertex3f(8, vx, z);
-        glVertex3f(8, vy, z);
-        glVertex3f(-8, vy, z);
-    }
-    else {
-        glVertex3f(-4, vx, z);
-        glVertex3f(4, vx, z);
-        glVertex3f(4, vy, z);
-        glVertex3f(-4, vy, z);
-    }
-    // end body
-    // Arms
-    if (rotate == PLAYER_ROT_F
-        || rotate == PLAYER_ROT_B) {
-        glVertex3f(-16, vx, z);
-        glVertex3f(-8, vx, z);
-        glVertex3f(-8, vy, z);
-        glVertex3f(-16, vy, z);
-        glVertex3f(16, vx, z);
-        glVertex3f(8, vx, z);
-        glVertex3f(8, vy, z);
-        glVertex3f(16, vy, z);
-    }
-    // end arms
-    // Legs
-    vx = height - 64;
-    vy = height - 40;
-    if (rotate == PLAYER_ROT_F
-        || rotate == PLAYER_ROT_B) {
-        // right leg
-        glVertex3f(-8, vx, z);
-        glVertex3f(0, vx, z);
-        glVertex3f(0, vy, z);
-        glVertex3f(-8, vy, z);
-        // left leg
-        glVertex3f(8, vx, z);
-        glVertex3f(0, vx, z);
-        glVertex3f(0, vy, z);
-        glVertex3f(8, vy, z);
-    }
-    else if (rotate == PLAYER_ROT_R) {
-        // right leg
-        glVertex3f(-4, vx, z);
-        glVertex3f(4, vx, z);
-        glVertex3f(4, vy, z);
-        glVertex3f(-4, vy, z);
-    }
-    else if (rotate == PLAYER_ROT_L) {
-        // left leg
-        glVertex3f(-4, vx, z);
-        glVertex3f(4, vx, z);
-        glVertex3f(4, vy, z);
-        glVertex3f(-4, vy, z);
-    }
-    // end legs
-    // Head
-    glColor4f(0.0f, 0.0f, 0.0f, (1 - z) / 5);
-    vx = height - 16;
-    vy = height;
-    glVertex3f(-8, vx, z);
-    glVertex3f(8, vx, z);
-    glVertex3f(8, vy, z);
-    glVertex3f(-8, vy, z);
-    // end head
-
+    glPushMatrix();
+    glTranslatef(0, 48, 0);
+    glRotatef(yRot, 0, 1, 0);
+    glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
+    glBegin(GL_QUADS);
+    // front
+    glTexCoord2f(u16, v16); glVertex3f(-0.25f, 0, 0.125f);
+    glTexCoord2f(u16, v28); glVertex3f(-0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u24, v28); glVertex3f(0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u24, v16); glVertex3f(0.25f, 0, 0.125f);
+    // left
+    glTexCoord2f(u12, v16); glVertex3f(-0.25f, 0, -0.125f);
+    glTexCoord2f(u12, v28); glVertex3f(-0.25f, -0.75f, -0.125f);
+    glTexCoord2f(u16, v28); glVertex3f(-0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u16, v16); glVertex3f(-0.25f, 0, 0.125f);
+    // right
+    glTexCoord2f(u24, v16); glVertex3f(0.25f, 0, 0.125f);
+    glTexCoord2f(u24, v28); glVertex3f(0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u28, v28); glVertex3f(0.25f, -0.75f, -0.125f);
+    glTexCoord2f(u28, v16); glVertex3f(0.25f, 0, -0.125f);
     glEnd();
-    // end shadow
+    glPopMatrix();
+
+    // right arm
+    glPushMatrix();
+    glTranslatef(0, 48, 0);
+    glRotatef(yRot, 0, 1, 0);
+    glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
+    glBegin(GL_QUADS);
+    // front
+    glTexCoord2f(u32, v16); glVertex3f(-0.5f, 0, 0.125f);
+    glTexCoord2f(u32, v28); glVertex3f(-0.5f, -0.75f, 0.125f);
+    glTexCoord2f(u36, v28); glVertex3f(-0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u36, v16); glVertex3f(-0.25f, 0, 0.125f);
+    // left
+    glTexCoord2f(u28, v16); glVertex3f(-0.5f, 0, -0.125f);
+    glTexCoord2f(u28, v28); glVertex3f(-0.5f, -0.75f, -0.125f);
+    glTexCoord2f(u32, v28); glVertex3f(-0.5f, -0.75f, 0.125f);
+    glTexCoord2f(u32, v16); glVertex3f(-0.5f, 0, 0.125f);
+    // right
+    glTexCoord2f(u36, v16); glVertex3f(-0.25f, 0, 0.125f);
+    glTexCoord2f(u36, v28); glVertex3f(-0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u40, v28); glVertex3f(-0.25f, -0.75f, -0.125f);
+    glTexCoord2f(u40, v16); glVertex3f(-0.25f, 0, -0.125f);
+    glEnd();
+    glPopMatrix();
+
+    // left arm
+    glPushMatrix();
+    glTranslatef(0, 48, 0);
+    glRotatef(yRot, 0, 1, 0);
+    glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
+    glBegin(GL_QUADS);
+    // front
+    glTexCoord2f(u28, v40); glVertex3f(0.25f, 0, 0.125f);
+    glTexCoord2f(u28, v52); glVertex3f(0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u32, v52); glVertex3f(0.5f, -0.75f, 0.125f);
+    glTexCoord2f(u32, v40); glVertex3f(0.5f, 0, 0.125f);
+    // left
+    glTexCoord2f(u24, v40); glVertex3f(0.25f, 0, -0.125f);
+    glTexCoord2f(u24, v52); glVertex3f(0.25f, -0.75f, -0.125f);
+    glTexCoord2f(u28, v52); glVertex3f(0.25f, -0.75f, 0.125f);
+    glTexCoord2f(u28, v40); glVertex3f(0.25f, 0, 0.125f);
+    // right
+    glTexCoord2f(u32, v40); glVertex3f(0.5f, 0, 0.125f);
+    glTexCoord2f(u32, v52); glVertex3f(0.5f, -0.75f, 0.125f);
+    glTexCoord2f(u36, v52); glVertex3f(0.5f, -0.75f, -0.125f);
+    glTexCoord2f(u36, v40); glVertex3f(0.5f, 0, -0.125f);
+    glEnd();
+    glPopMatrix();
+
+    // right leg
+    glPushMatrix();
+    glRotatef(yRot, 0, 1, 0);
+    glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
+    glBegin(GL_QUADS);
+    // front
+    glTexCoord2f(u4, v16); glVertex3f(-0.25f, 0.75f, 0.125f);
+    glTexCoord2f(u4, v28); glVertex3f(-0.25f, 0, 0.125f);
+    glTexCoord2f(u8, v28); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u8, v16); glVertex3f(0, 0.75f, 0.125f);
+    // left
+    glTexCoord2f(u0, v16); glVertex3f(-0.25f, 0.75f, -0.125f);
+    glTexCoord2f(u0, v28); glVertex3f(-0.25f, 0, -0.125f);
+    glTexCoord2f(u4, v28); glVertex3f(-0.25f, 0, 0.125f);
+    glTexCoord2f(u4, v16); glVertex3f(-0.25f, 0.75f, 0.125f);
+    // right
+    glTexCoord2f(u8, v16); glVertex3f(0, 0.75f, 0.125f);
+    glTexCoord2f(u8, v28); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u16, v28); glVertex3f(0, 0, -0.125f);
+    glTexCoord2f(u16, v16); glVertex3f(0, 0.75f, -0.125f);
+    glEnd();
+    glPopMatrix();
+
+    // left leg
+    glPushMatrix();
+    glRotatef(yRot, 0, 1, 0);
+    glScalef(WORLD_RENDER_NML, WORLD_RENDER_NML, WORLD_RENDER_NML);
+    glBegin(GL_QUADS);
+    // front
+    glTexCoord2f(u16, v40); glVertex3f(0, 0.75f, 0.125f);
+    glTexCoord2f(u16, v52); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u20, v52); glVertex3f(0.25f, 0, 0.125f);
+    glTexCoord2f(u20, v40); glVertex3f(0.25f, 0.75f, 0.125f);
+    // left
+    glTexCoord2f(u12, v40); glVertex3f(0, 0.75f, -0.125f);
+    glTexCoord2f(u12, v52); glVertex3f(0, 0, -0.125f);
+    glTexCoord2f(u16, v52); glVertex3f(0, 0, 0.125f);
+    glTexCoord2f(u16, v40); glVertex3f(0, 0.75f, 0.125f);
+    // right
+    glTexCoord2f(u20, v40); glVertex3f(0.25f, 0.75f, 0.125f);
+    glTexCoord2f(u20, v52); glVertex3f(0.25f, 0, 0.125f);
+    glTexCoord2f(u24, v52); glVertex3f(0.25f, 0, -0.125f);
+    glTexCoord2f(u24, v40); glVertex3f(0.25f, 0.75f, -0.125f);
+    glEnd();
+    glPopMatrix();
+
+    texmgr.bindTexture(0);
+
+    // handled block
+    const int bid = choosingBlock->getId();
+    const GLfloat bu0 = BLOCK_TEX_U0(bid);
+    const GLfloat bv0 = BLOCK_TEX_V0(bid);
+    const GLfloat bu1 = BLOCK_TEX_U1(bid);
+    const GLfloat bv1 = BLOCK_TEX_V1(bid);
+    const GLfloat bts = (GLfloat)BLOCK_TEX_SIZE;
+    const GLfloat hbts = (GLfloat)BLOCK_TEX_SIZE * 0.5f;
+    texmgr.bindTexture(blocks);
+    glPushMatrix();
+    glTranslatef(0, 48, 0);
+    glRotatef(yRot, 0, 1, 0);
+    glBegin(GL_QUADS);
+    glTexCoord2f(bu0, bv0); glVertex3f(-12 - hbts, -24, 5);
+    glTexCoord2f(bu0, bv1); glVertex3f(-12 - hbts, (-bts) - 24, 5);
+    glTexCoord2f(bu1, bv1); glVertex3f(-12 + hbts, (-bts) - 24, 5);
+    glTexCoord2f(bu1, bv0); glVertex3f(-12 + hbts, -24, 5);
+    glEnd();
+    glPopMatrix();
+    texmgr.bindTexture(0);
 
     glPopMatrix();
 }

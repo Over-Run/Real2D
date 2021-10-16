@@ -5,11 +5,11 @@
 using Real2D::Timer;
 
 Timer::Timer(double tps_) : tps(tps_) {
-    lastTime = glfwGetTime() * NS_PER_SECOND;
+    lastTime = (int64_t)(glfwGetTime() * NS_PER_SECOND);
 }
 void Timer::advanceTime() {
-    double now = glfwGetTime() * NS_PER_SECOND;;
-    double passedNs = now - lastTime;
+    int64_t now = (int64_t)(glfwGetTime() * NS_PER_SECOND);
+    int64_t passedNs = now - lastTime;
     lastTime = now;
     if (passedNs < 0) {
         passedNs = 0;
@@ -17,7 +17,7 @@ void Timer::advanceTime() {
     else if (passedNs > MAX_NS_PER_UPDATE) {
         passedNs = MAX_NS_PER_UPDATE;
     }
-    lastFps = MAX_NS_PER_UPDATE / passedNs;
+    fps = (double)(NS_PER_SECOND / passedNs);
     passedTime += passedNs * tps / NS_PER_SECOND;
     ticks = (int)passedTime;
     if (ticks > MAX_TICKS_PER_UPDATE) {

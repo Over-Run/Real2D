@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #define STB_IMAGE_IMPLEMENTATION
-#include "real2d/stb.h"
+#include "real2d/stb_c.h"
 
 using std::cerr;
 using std::endl;

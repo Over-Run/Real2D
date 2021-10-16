@@ -1,35 +1,30 @@
 #pragma once
-
-#define XLATE(axis) ((axis) * BLOCK_RENDER_SIZE)
-
-constexpr auto BLOCK_TEX_SIZE = 16;
-constexpr auto BLOCKS_TEX_SIZE = 256;
-constexpr auto BLOCK_RENDER_SIZE = 32;
-#define BLOCKS_PER_TEX (BLOCKS_TEX_SIZE / BLOCK_TEX_SIZE)
-#define BLOCK_TEX_UV_FACTOR ((float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_SIZE)
-
-#define X_OFFSET ((width >> 1) - player.x * BLOCK_RENDER_SIZE)
-#define Y_OFFSET ((height >> 1) - (player.y + 1) * BLOCK_RENDER_SIZE)
-
-#define BLOCK(nm) (Blocks::nm)
-#define AIR_BLOCK BLOCK(AIR)
+#include "aabb.h"
 
 namespace Real2D {
     class Block {
-    private:
-        const int id;
     public:
-        Block(const int id_);
+        Block();
         Block(const Block&) = delete;
         Block operator=(const Block&) = delete;
         bool operator==(const Block&) const;
         bool operator!=(const Block&) const;
         /// <summary>
-        /// Get this block's number id.
+        /// Get this block's raw id.
         /// </summary>
-        /// <returns>The number id.</returns>
-        const int getId() const;
+        /// <returns>The raw id.</returns>
+        int getId() const;
+        virtual bool shading();
+        virtual AABBox* getOutline();
+        virtual AABBox* getCollision();
     };
+    class AirBlock : public Block {
+    public:
+        virtual bool shading();
+        virtual AABBox* getCollision();
+    };
+
+    using block_t = Real2D::Block*;
 
     /*class BlockStates {
     private:
@@ -43,13 +38,13 @@ namespace Real2D {
         const Block& getBlock();
         void setBlock(const Block& block_);
     };*/
+}
 
+namespace Real2D {
     struct Blocks {
-        static const Block* const AIR;
-        static const Block* const GRASS_BLOCK;
-        static const Block* const STONE;
-
-        ~Blocks();
+        static block_t AIR;
+        static block_t GRASS_BLOCK;
+        static block_t STONE;
     };
 
     /// <summary>
@@ -59,9 +54,5 @@ namespace Real2D {
     /// <param name="y">Pos y.</param>
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
-    /// <param name="layer">The layer of rendering.
-    /// 0 of normal, 1 of dark, 2 of select.</param>
-    extern void renderBlock(int x, int y, int z, const Block* block, int layer);
+    extern void renderBlock(int, int, int, block_t);
 }
-
-using block_t = const Real2D::Block*;

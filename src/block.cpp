@@ -1,30 +1,45 @@
 #include "real2d/block.h"
 #include "real2d/player.h"
+#include "real2d/real2d_def_c.h"
+#include "real2d/reg.h"
 #include "glad/gl.h"
 
-#define SET_UV int id = block->getId(); \
-GLfloat u0 = ((id - 1) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
-GLfloat u1 = (id % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
-GLfloat v0 = ((id - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR; \
-GLfloat v1 = (id / BLOCKS_PER_TEX + 1) * BLOCK_TEX_UV_FACTOR
-
+using std::string;
 using Real2D::Block;
+using Real2D::AirBlock;
+using Real2D::block_t;
 using Real2D::Blocks;
-using Real2D::Player;
+using Real2D::AABBox;
+using Real2D::Registry;
+using Real2D::Registries;
 
-extern int width;
-extern int height;
-extern Player player;
+Registry<block_t>* Registries::BLOCK = new Registry(&Blocks::AIR);
 
-Block::Block(const int id_) : id(id_) {}
-const int Block::getId() const {
-    return id;
+Block::Block() {}
+int Block::getId() const {
+    return Registries::BLOCK->get(const_cast<Block*>(this));
 }
 bool Block::operator==(const Block& block_) const {
-    return id == block_.id;
+    return getId() == block_.getId();
 }
 bool Block::operator!=(const Block& block_) const {
-    return id != block_.id;
+    return getId() != block_.getId();
+}
+bool Block::shading() {
+    return true;
+}
+AABBox* Block::getOutline() {
+    return (AABBox*)&AABBox::FULL_CUBE;
+}
+AABBox* Block::getCollision() {
+    return getOutline();
+}
+
+bool AirBlock::shading() {
+    return false;
+}
+AABBox* AirBlock::getCollision() {
+    return nullptr;
 }
 
 /*BlockStates::BlockStates(int x_, int y_, int z_, const Block& block_) :
@@ -47,47 +62,36 @@ void BlockStates::setBlock(const Block& block_) {
     block = &block_;
 }*/
 
-const Block* const Blocks::AIR = new Block(0);
-const Block* const Blocks::GRASS_BLOCK = new Block(1);
-const Block* const Blocks::STONE = new Block(2);
-Blocks::~Blocks() {
-    delete AIR;
-    delete GRASS_BLOCK;
-    delete STONE;
+template<typename T>
+block_t reg(int rawId, string id, T block) {
+    return Registries::BLOCK->set(rawId, id, block);
 }
 
-void Real2D::renderBlock(int x, int y, int z, const Block* block, int layer) {
-    GLfloat xo = X_OFFSET;
-    GLfloat yo = Y_OFFSET;
-    GLfloat xi = XLATE(x) + xo;
-    GLfloat xi1 = XLATE(x + 1) + xo;
-    GLfloat yi = XLATE(y) + yo;
-    GLfloat yi1 = XLATE(y + 1) + yo;
-    if (xi1 < 0
-        || xi > width + 1
-        || yi1 < 0
-        || yi > height + 1) {
-        return;
-    }
-    if (layer == 1) {
-        glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-        glVertex2f(xi, yi1);
-        glVertex2f(xi, yi);
-        glVertex2f(xi1, yi);
-        glVertex2f(xi1, yi1);
+block_t Blocks::AIR = reg(0, "air_block", new AirBlock());
+block_t Blocks::GRASS_BLOCK = reg(1, "grass_block", new Block());
+block_t Blocks::STONE = reg(2, "stone", new Block());
+
+void Real2D::renderBlock(int x, int y, int z, block_t block) {
+    GLfloat xi = (GLfloat)UNML(x);
+    GLfloat xi1 = (GLfloat)UNML(x + 1);
+    GLfloat yi = (GLfloat)UNML(y);
+    GLfloat yi1 = (GLfloat)UNML(y + 1);
+    GLfloat zi = (GLfloat)UNML(z);
+    int id = block->getId();
+    GLfloat u0 = BLOCK_TEX_U0(id);
+    GLfloat u1 = BLOCK_TEX_U1(id);
+    GLfloat v0 = BLOCK_TEX_V0(id);
+    GLfloat v1 = BLOCK_TEX_V1(id);
+    GLfloat color;
+    if (z == 0) {
+        color = 0.5f;
     }
     else {
-        SET_UV;
-        if (layer == 0) {
-            glColor3f(1.0f, 1.0f, 1.0f);
-        }
-        else if (layer == 2) {
-            glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
-        }
-        GLfloat fz = (GLfloat)z;
-        glTexCoord2f(u0, v0); glVertex3f(xi, yi1, fz);
-        glTexCoord2f(u0, v1); glVertex3f(xi, yi, fz);
-        glTexCoord2f(u1, v1); glVertex3f(xi1, yi, fz);
-        glTexCoord2f(u1, v0); glVertex3f(xi1, yi1, fz);
+        color = 1.0f;
     }
+    glColor3f(color, color, color);
+    glTexCoord2f(u0, v0); glVertex3f(xi, yi1, zi);
+    glTexCoord2f(u0, v1); glVertex3f(xi, yi, zi);
+    glTexCoord2f(u1, v1); glVertex3f(xi1, yi, zi);
+    glTexCoord2f(u1, v0); glVertex3f(xi1, yi1, zi);
 }
