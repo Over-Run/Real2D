@@ -14,14 +14,14 @@ namespace Real2D {
         /// </summary>
         /// <returns>The raw id.</returns>
         int getId() const;
-        virtual bool shading();
+        virtual bool isOpaque();
         virtual AABBox* getOutline();
         virtual AABBox* getCollision();
     };
     class AirBlock : public Block {
     public:
-        virtual bool shading();
-        virtual AABBox* getCollision();
+        bool isOpaque() override;
+        AABBox* getCollision() override;
     };
 
     using block_t = Real2D::Block*;
@@ -47,6 +47,8 @@ namespace Real2D {
         static block_t STONE;
     };
 
+    class World;
+
     /// <summary>
     /// Render a block.
     /// </summary>
@@ -54,5 +56,6 @@ namespace Real2D {
     /// <param name="y">Pos y.</param>
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
-    extern void renderBlock(int, int, int, block_t);
+    /// <param name="world">The world.</param>
+    extern void renderBlock(int, int, int, block_t, World*);
 }

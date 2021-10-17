@@ -5,13 +5,11 @@
 #include "glad/gl.h"
 
 namespace Real2D {
-    struct TexMgr {
-        std::map<std::string, GLuint> idmap;
-        GLuint lastId;
-        GLuint loadTexture(std::string img);
-        void bindTexture(GLuint id);
-        void bindTexture(std::string img);
+    class TexMgr {
+    public:
+        static std::map<std::string, GLuint> id_map;
+        static GLuint loadTexture(std::string img);
+        static void bindTexture(GLuint id);
+        static void bindTexture(std::string img);
     };
 }
-
-extern Real2D::TexMgr texmgr;

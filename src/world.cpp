@@ -1,9 +1,6 @@
-#include "real2d/texmgr_c.h"
 #include "real2d/player.h"
 #include "real2d/world.h"
 #include "real2d/window_c.h"
-#include "real2d/aabb.h"
-#include "real2d/hit.h"
 #include "real2d/real2d_def_c.h"
 #include "real2d/reg.h"
 #include "real2d/files.h"
@@ -34,7 +31,6 @@ block_t choosingBlock = BLOCK(GRASS_BLOCK);
 HitResult* hit_result = nullptr;
 int selectz = 1;
 
-GLuint list;
 extern GLuint blocks;
 
 bool isMouseDown(int button) {
@@ -43,29 +39,31 @@ bool isMouseDown(int button) {
 
 World::World() :
     version(WORLD_VER),
-    world(new block_t[WORLD_SIZE]),
-    player(new Player(this)),
-    is_dirty(true) {
-    if (world == nullptr) {
-        throw "Unable to create world";
-    }
-    if (player == nullptr) {
-        throw "Unable to create player";
-    }
+    world((block_t*)malloc(sizeof(block_t)* WORLD_SIZE)),
+    listeners(new vector<WorldListener*>),
+    player(new Player(this)) {
     for (int i = 0; i < WORLD_SIZE; ++i) {
         world[i] = AIR_BLOCK;
     }
-}
-World::~World() {
-    save();
-    delete[] world;
-    world = nullptr;
-    delete player;
-    player = nullptr;
-    if (glDeleteLists) {
-        glDeleteLists(list, 1);
+    for (int z = 0; z < WORLD_D; ++z) {
+        for (int x = 0; x < WORLD_W; ++x) {
+            calcLights(x, z);
+        }
     }
 }
+
+World::~World() {
+    save();
+    if (world != nullptr) {
+        free(world);
+        world = nullptr;
+    }
+    delete player;
+    player = nullptr;
+    delete listeners;
+    listeners = nullptr;
+}
+
 void World::create() {
     if (!load()) {
         for (int z = 0; z < WORLD_D; ++z) {
@@ -78,107 +76,12 @@ void World::create() {
                     else if (y == 3) {
                         b = BLOCK(GRASS_BLOCK);
                     }
-                    setBlock(x, y, z, b);
+                    world[WORLD_BLOCK_I(x, y, z)] = b;
                 }
             }
         }
         save();
     }
-    list = glGenLists(1);
-}
-void World::render(double delta) {
-    if (isDirty()) {
-        glNewList(list, GL_COMPILE);
-        glBegin(GL_QUADS);
-        for (int z = 0; z < WORLD_D; ++z) {
-            for (int x = 0; x < WORLD_W; ++x) {
-                for (int y = 0; y < WORLD_H; ++y) {
-                    block_t block = getBlock(x, y, z);
-                    if (block != AIR_BLOCK) {
-                        renderBlock(x, y, z, block);
-                    }
-                }
-            }
-        }
-        glEnd();
-        glEndList();
-        is_dirty = false;
-    }
-}
-
-void renderHit(double delta) {
-    float x = (float)hit_result->x;
-    float y = (float)hit_result->y;
-    float z = (float)hit_result->z;
-    AABBox bb;
-    hit_result->block->getOutline()->move(x, y, z, &bb);
-    GLfloat fz = UNML(bb.start_z);
-    GLfloat fx = UNML(bb.start_x);
-    GLfloat fx1 = UNML(bb.end_x);
-    GLfloat fy = UNML(bb.start_y);
-    GLfloat fy1 = UNML(bb.end_y);
-    glBegin(GL_LINE_LOOP);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
-    glVertex3f(fx + 1, fy1, fz);
-    glVertex3f(fx + 1, fy, fz);
-    glVertex3f(fx1, fy, fz);
-    glVertex3f(fx1, fy1 - 1, fz);
-    glEnd();
-}
-
-void World::select() {
-    int mx = Window::mouseX;
-    int my = Window::height - Window::mouseY;
-    bool selected = false;
-    const GLfloat xo = X_OFFSET;
-    const GLfloat yo = Y_OFFSET;
-    for (int x = 0; x < WORLD_W; ++x) {
-        for (int y = 0; y < WORLD_H; ++y) {
-            block_t& block = getBlock(x, y, selectz);
-            GLfloat bx = (GLfloat)UNML(x);
-            GLfloat bx1 = bx + WORLD_RENDER_NML;
-            GLfloat by = (GLfloat)UNML(y);
-            GLfloat by1 = by + WORLD_RENDER_NML;
-            GLfloat obx = bx + xo;
-            GLfloat obx1 = bx1 + xo;
-            GLfloat oby = by + yo;
-            GLfloat oby1 = by1 + yo;
-            if (mx >= obx
-                && mx < obx1
-                && my >= oby
-                && my < oby1) {
-                selected = true;
-                hit_result = new HitResult(x, y, selectz, block);
-                goto unloop;
-            }
-        }
-    }
-unloop:
-    // Check outside world
-    if (!selected) {
-        delete hit_result;
-        hit_result = nullptr;
-    }
-}
-void World::renderSelect(double delta) {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glPushMatrix();
-    glTranslatef(X_OFFSET, Y_OFFSET, 0);
-    render(delta);
-    texmgr.bindTexture(blocks);
-    glCallList(list);
-    texmgr.bindTexture(0);
-    select();
-    if (hit_result != nullptr) {
-        renderHit(delta);
-    }
-    glPopMatrix();
-
-    glDisable(GL_BLEND);
-
-    player->render(delta);
 }
 
 void World::tick() {
@@ -203,6 +106,24 @@ void World::tick() {
         }
     }
     player->tick();
+}
+
+void World::addListener(WorldListener* listener) {
+    listeners->push_back(listener);
+}
+
+void World::calcLights(int x, int z) {
+    int light = 15;
+    for (int y = WORLD_H; y >= 0; y--) {
+        lights[WORLD_BLOCK_I(x, y, z)] = light;
+        if (light > 0 && getBlock(x, y, z)->isOpaque()) {
+            --light;
+        }
+    }
+}
+
+int World::getLight(int x, int y, int z) {
+    return lights[WORLD_BLOCK_I(x, y, z)];
 }
 
 vector<AABBox> World::getCubes(AABBox box) {
@@ -237,14 +158,6 @@ vector<AABBox> World::getCubes(AABBox box) {
     return cubes;
 }
 
-void World::markDirty() {
-    is_dirty = true;
-}
-
-bool World::isDirty() {
-    return is_dirty;
-}
-
 block_t& World::getBlock(int x, int y, int z) {
     if (x >= 0 && x < WORLD_W
         && y >= 0 && y < WORLD_H
@@ -258,8 +171,14 @@ void World::setBlock(int x, int y, int z, block_t block) {
     if (x >= 0 && x < WORLD_W
         && y >= 0 && y < WORLD_H
         && z >= 0 && z < WORLD_D) {
+        if (world[WORLD_BLOCK_I(x, y, z)] == block) {
+            return;
+        }
         world[WORLD_BLOCK_I(x, y, z)] = block;
-        markDirty();
+        calcLights(x, z);
+        for (auto l : *listeners) {
+            l->blockChanged(x, y, z);
+        }
     }
 }
 

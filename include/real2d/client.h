@@ -7,6 +7,6 @@ namespace Real2D {
         void run();
         void render(double delta);
         void tick();
-        ~Client();
+        void close();
     };
 }

@@ -185,6 +185,7 @@
     <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\window_c.cpp" />
     <ClCompile Include="src\world.cpp" />
+    <ClCompile Include="src\world_c.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\aabb.h" />
