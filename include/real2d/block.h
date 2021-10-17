@@ -6,7 +6,7 @@ namespace Real2D {
     public:
         Block();
         Block(const Block&) = delete;
-        Block operator=(const Block&) = delete;
+        Block operator=(const Block&);
         bool operator==(const Block&) const;
         bool operator!=(const Block&) const;
         /// <summary>
@@ -14,17 +14,15 @@ namespace Real2D {
         /// </summary>
         /// <returns>The raw id.</returns>
         int getId() const;
-        virtual bool shading();
+        virtual bool isOpaque();
         virtual AABBox* getOutline();
         virtual AABBox* getCollision();
     };
     class AirBlock : public Block {
     public:
-        virtual bool shading();
-        virtual AABBox* getCollision();
+        bool isOpaque() override;
+        AABBox* getCollision() override;
     };
-
-    using block_t = Real2D::Block*;
 
     /*class BlockStates {
     private:
@@ -38,14 +36,13 @@ namespace Real2D {
         const Block& getBlock();
         void setBlock(const Block& block_);
     };*/
-}
 
-namespace Real2D {
     struct Blocks {
-        static block_t AIR;
-        static block_t GRASS_BLOCK;
-        static block_t STONE;
+        static Block* AIR;
+        static Block* GRASS_BLOCK;
+        static Block* STONE;
     };
+    class World;
 
     /// <summary>
     /// Render a block.
@@ -54,5 +51,6 @@ namespace Real2D {
     /// <param name="y">Pos y.</param>
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
-    extern void renderBlock(int, int, int, block_t);
+    /// <param name="world">The world.</param>
+    extern void renderBlock(int, int, int, Block*, World*);
 }

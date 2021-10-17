@@ -1,7 +1,6 @@
 #include "real2d/player.h"
 #include "real2d/texmgr_c.h"
 #include "real2d/window_c.h"
-#include "real2d/block.h"
 #include "real2d/world.h"
 #include "real2d/real2d_def_c.h"
 #include <cmath>
@@ -10,12 +9,12 @@ using std::vector;
 using Real2D::Player;
 using Real2D::Window;
 using Real2D::AABBox;
-using Real2D::block_t;
+using Real2D::Block;
 
 float headXRot = 0.0f;
 float yRot = 0.0f;
 
-extern block_t choosingBlock;
+extern Block* choosingBlock;
 extern GLuint blocks;
 
 inline bool isKeyDown(int key) {
@@ -119,7 +118,7 @@ void Player::move(float xa, float ya, float speed) {
 void Player::render(double delta) {
     glPushMatrix();
     glTranslatef(Window::width * 0.5f, Window::height * 0.5f, 20.125f);
-    GLuint id = texmgr.loadTexture(TEX_PLAYER);
+    GLuint id = TexMgr::loadTexture(TEX_PLAYER);
 
     const GLfloat u0 = 0;
     const GLfloat u4 = 4 / TEX_PLAYER_W;
@@ -140,7 +139,7 @@ void Player::render(double delta) {
     const GLfloat v52 = 52 / TEX_PLAYER_H;
 
     glColor3f(1.0f, 1.0f, 1.0f);
-    texmgr.bindTexture(id);
+    TexMgr::bindTexture(id);
     // Head
     glPushMatrix();
     glTranslatef(0, 48, -8);
@@ -294,7 +293,7 @@ void Player::render(double delta) {
     glEnd();
     glPopMatrix();
 
-    texmgr.bindTexture(0);
+    TexMgr::bindTexture(0);
 
     // handled block
     const int bid = choosingBlock->getId();
@@ -304,7 +303,7 @@ void Player::render(double delta) {
     const GLfloat bv1 = BLOCK_TEX_V1(bid);
     const GLfloat bts = (GLfloat)BLOCK_TEX_SIZE;
     const GLfloat hbts = (GLfloat)BLOCK_TEX_SIZE * 0.5f;
-    texmgr.bindTexture(blocks);
+    TexMgr::bindTexture(blocks);
     glPushMatrix();
     glTranslatef(0, 48, 0);
     glRotatef(yRot, 0, 1, 0);
@@ -315,7 +314,7 @@ void Player::render(double delta) {
     glTexCoord2f(bu1, bv0); glVertex3f(-12 + hbts, -24, 5);
     glEnd();
     glPopMatrix();
-    texmgr.bindTexture(0);
+    TexMgr::bindTexture(0);
 
     glPopMatrix();
 }

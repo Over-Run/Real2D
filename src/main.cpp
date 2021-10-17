@@ -7,8 +7,9 @@
 
 using Real2D::Client;
 
+Client client;
+
 int main() {
-    Client client;
     client.start();
     return 0;
 }

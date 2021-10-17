@@ -9,7 +9,7 @@ using std::ostringstream;
 
 stbi_uc* stbi_load_out(const char* filename, int* x, int* y, int* comp, int req_comp) {
     stbi_uc* data = stbi_load(filename, x, y, comp, req_comp);
-    if (!data) {
+    if (data == nullptr) {
         ostringstream oss;
         oss << "Error loading image " << filename << ": " << stbi_failure_reason();
         std::string s = oss.str();

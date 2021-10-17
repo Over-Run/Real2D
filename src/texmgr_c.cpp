@@ -1,13 +1,13 @@
 #include "real2d/texmgr_c.h"
 #include "real2d/stb_c.h"
+#include "real2d/real2d_def.h"
 
 using Real2D::TexMgr;
 using std::map;
 using std::pair;
 using std::string;
 
-TexMgr texmgr;
-
+std::map<std::string, GLuint> TexMgr::idmap;
 GLuint TexMgr::loadTexture(string img) {
     if (idmap.count(img) > 0) {
         return idmap[img];
@@ -18,7 +18,7 @@ GLuint TexMgr::loadTexture(string img) {
     GLuint id = 0;
     const size_t l = img.size() + 1;
     char* c = new char[l];
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifdef MSVC8
     strcpy_s(c, l, img.c_str());
 #else
     strcpy(c, img.c_str());
@@ -43,7 +43,7 @@ GLuint TexMgr::loadTexture(string img) {
     delete[] c;
     return id;
 }
-void TexMgr::bindTexture(GLuint id) {
+void TexMgr::bindTexture(int id) {
     glBindTexture(GL_TEXTURE_2D, id);
 }
 void TexMgr::bindTexture(string img) {

@@ -4,26 +4,29 @@
 #include "glad/gl.h"
 #include "real2d/stb_c.h"
 #include "real2d/timer.h"
-#include "real2d/world.h"
 #include "real2d/texmgr_c.h"
 #include "real2d/real2d_def_c.h"
+#include "real2d/world_c.h"
 #include <cstdarg>
 #include <cstdlib>
 
 using std::va_list;
 using Real2D::Timer;
 using Real2D::World;
+using Real2D::WorldRenderer;
 using Real2D::Client;
+using Real2D::TexMgr;
 
 window_t window;
 
 Timer timer(60);
 World* world;
+WorldRenderer* worldRenderer;
 
 GLuint blocks;
 
 void loadTexture() {
-    blocks = texmgr.loadTexture(TEX_BLOCKS);
+    blocks = TexMgr::loadTexture(TEX_BLOCKS);
 }
 
 char* appendTitle(int count, ...) {
@@ -99,6 +102,8 @@ void Client::start() {
     glEnable(GL_TEXTURE_2D);
     world = new World();
     world->create();
+    worldRenderer = new WorldRenderer(world);
+    world->addListener(worldRenderer);
 
     loadTexture();
     timer.advanceTime();
@@ -127,7 +132,7 @@ void Client::run() {
 #endif
             auto c = appendTitle(1, s);
             glfwSetWindowTitle(window, c);
-            lastTime += 1000;
+            lastTime += 1000LL;
             frames = 0;
         }
     }
@@ -136,7 +141,7 @@ void Client::render(double delta) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    world->renderSelect(delta);
+    worldRenderer->renderPick(delta);
     glDisable(GL_DEPTH_TEST);
     glfwSwapBuffers(window);
 }
@@ -144,9 +149,10 @@ void Client::tick() {
     world->tick();
 }
 Client::~Client() {
-    if (world != nullptr) {
-        delete world;
-    }
+    delete world;
+    world = nullptr;
+    delete worldRenderer;
+    worldRenderer = nullptr;
     glfwSetKeyCallback(window, nullptr);
     glfwSetFramebufferSizeCallback(window, nullptr);
     glfwSetCursorPosCallback(window, nullptr);

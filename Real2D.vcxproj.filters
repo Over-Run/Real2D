@@ -75,6 +75,9 @@
     <ClCompile Include="src\files.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\world_c.cpp">
+      <Filter>Sources\World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\real2d\timer.h">
