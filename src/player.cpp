@@ -9,12 +9,10 @@ using std::vector;
 using Real2D::Player;
 using Real2D::Window;
 using Real2D::AABBox;
-using Real2D::Block;
 
 float headXRot = 0.0f;
 float yRot = 0.0f;
 
-extern Block* choosingBlock;
 extern GLuint blocks;
 
 inline bool isKeyDown(int key) {

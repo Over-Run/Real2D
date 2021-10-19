@@ -6,7 +6,7 @@ namespace Real2D {
     public:
         Block();
         Block(const Block&) = delete;
-        Block operator=(const Block&);
+        Block operator=(const Block&) = delete;
         bool operator==(const Block&) const;
         bool operator!=(const Block&) const;
         /// <summary>
@@ -37,13 +37,13 @@ namespace Real2D {
         void setBlock(const Block& block_);
     };*/
 
-    struct Blocks {
-        static Block* AIR;
-        static Block* GRASS_BLOCK;
-        static Block* STONE;
-    };
-    class World;
+    using block_t = Block*;
 
+    struct Blocks {
+        static block_t AIR;
+        static block_t GRASS_BLOCK;
+        static block_t STONE;
+    };
     class World;
 
     /// <summary>

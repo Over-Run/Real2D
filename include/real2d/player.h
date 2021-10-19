@@ -13,7 +13,7 @@ namespace Real2D {
         World* world;
         float x, y, z;
         float prev_x, prev_y;
-        Real2D::AABBox bb;
+        AABBox bb;
         bool onGround;
 
         Player(World* _world);

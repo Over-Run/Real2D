@@ -25,8 +25,10 @@ namespace Real2D {
         std::map<T, int> rawIds();
         int size();
     };
+
     struct Registries {
-        static Registry<Real2D::Block*>* BLOCK;
+        static Registry<Block*>* BLOCK;
+
         template<typename T, typename R>
         R reg(Registry<T> registry, std::string id, R entry);
     };

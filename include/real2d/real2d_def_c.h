@@ -11,7 +11,7 @@ constexpr auto TEX_PLAYER_W = 48.0f;
 constexpr auto TEX_PLAYER_H = 64.0f;
 
 // client
-constexpr auto GAME_VER = "0.3.0";
+constexpr auto GAME_VER = "0.4.0";
 
 // block
 constexpr const char* TEX_BLOCKS = "res/block/blocks0.png";
