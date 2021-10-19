@@ -44,15 +44,4 @@ namespace Real2D {
         static block_t GRASS_BLOCK;
         static block_t STONE;
     };
-    class World;
-
-    /// <summary>
-    /// Render a block.
-    /// </summary>
-    /// <param name="x">Pos x.</param>
-    /// <param name="y">Pos y.</param>
-    /// <param name="z">Pos z.</param>
-    /// <param name="block">The block.</param>
-    /// <param name="world">The world.</param>
-    extern void renderBlock(int, int, int, block_t, World*);
 }

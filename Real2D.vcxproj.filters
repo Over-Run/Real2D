@@ -75,8 +75,11 @@
     <ClCompile Include="src\block.cpp">
       <Filter>Sources\World</Filter>
     </ClCompile>
+    <ClCompile Include="src\block_c.cpp">
+      <Filter>Sources\Client</Filter>
+    </ClCompile>
     <ClCompile Include="src\world_c.cpp">
-      <Filter>Sources\World</Filter>
+      <Filter>Sources\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,11 +128,14 @@
     <ClInclude Include="include\real2d\files.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\real2d\world_c.h">
-      <Filter>Headers\World</Filter>
-    </ClInclude>
     <ClInclude Include="include\real2d\player.h">
       <Filter>Headers\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\block_c.h">
+      <Filter>Headers\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="include\real2d\world_c.h">
+      <Filter>Headers\Client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

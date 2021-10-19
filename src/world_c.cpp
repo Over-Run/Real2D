@@ -3,9 +3,11 @@
 #include "real2d/window_c.h"
 #include "real2d/player.h"
 #include "real2d/texmgr_c.h"
+#include "real2d/block_c.h"
 
 using Real2D::Window;
 using Real2D::WorldRenderer;
+using Real2D::BlockRenderer;
 using Real2D::HitResult;
 using Real2D::AABBox;
 
@@ -42,7 +44,11 @@ void WorldRenderer::render(double delta) {
                 for (int y = 0; y < WORLD_H; ++y) {
                     block_t block = world->getBlock(x, y, z);
                     if (block != AIR_BLOCK) {
-                        renderBlock(x, y, z, block, world);
+                        float light = (1.0f / 30.0f) * world->getLight(x, y, z);
+                        if (z != 0) {
+                            light += 0.5f;
+                        }
+                        BlockRenderer::renderBlock(x, y, z, block, light);
                     }
                 }
             }

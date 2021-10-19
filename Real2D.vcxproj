@@ -175,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="src\aabb.cpp" />
     <ClCompile Include="src\block.cpp" />
+    <ClCompile Include="src\block_c.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\hit.cpp" />
@@ -192,6 +193,7 @@
   <ItemGroup>
     <ClInclude Include="include\real2d\aabb.h" />
     <ClInclude Include="include\real2d\block.h" />
+    <ClInclude Include="include\real2d\block_c.h" />
     <ClInclude Include="include\real2d\client.h" />
     <ClInclude Include="include\real2d\files.h" />
     <ClInclude Include="include\real2d\hit.h" />

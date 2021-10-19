@@ -88,6 +88,12 @@ void Player::move(float xa, float ya, float speed) {
             }
         }
         x += xd;
+        if (x < 0) {
+            x = 0;
+        }
+        if (x > WORLD_W) {
+            x = WORLD_W;
+        }
     }
     if (yd != 0) {
         for (auto c : cubes) {
@@ -99,18 +105,9 @@ void Player::move(float xa, float ya, float speed) {
         }
         onGround = ydOrg != yd && ydOrg < 0;
         y += yd;
-    }
-
-
-    // round (the earth is a ball)
-    if (x < 0) {
-        x = WORLD_W;
-    }
-    if (x > WORLD_W) {
-        x = 0;
-    }
-    if (y < -5) {
-        y = -5;
+        if (y < -5) {
+            y = -5;
+        }
     }
 }
 void Player::render(double delta) {
