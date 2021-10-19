@@ -293,8 +293,6 @@ void Player::render(double delta) {
     glEnd();
     glPopMatrix();
 
-    TexMgr::bindTexture(0);
-
     // handled block
     const int bid = choosingBlock->getId();
     const GLfloat bu0 = BLOCK_TEX_U0(bid);

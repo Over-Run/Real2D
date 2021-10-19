@@ -1,4 +1,3 @@
-#include "real2d/block.h"
 #include "real2d/player.h"
 #include "real2d/real2d_def_c.h"
 #include "real2d/reg.h"
@@ -18,7 +17,7 @@ Registry<Block*>* Registries::BLOCK = new Registry(&Blocks::AIR);
 
 Block::Block() {}
 int Block::getId() const {
-    return Registries::BLOCK->get(const_cast<Block*>(this));
+    return Registries::BLOCK->get(const_cast<block_t>(this));
 }
 bool Block::operator==(const Block& _block) const {
     return getId() == _block.getId();
@@ -72,7 +71,7 @@ Block* Blocks::AIR = reg(0, "air_block", new AirBlock());
 Block* Blocks::GRASS_BLOCK = reg(1, "grass_block", new Block());
 Block* Blocks::STONE = reg(2, "stone", new Block());
 
-void Real2D::renderBlock(int x, int y, int z, Block* block, World* world) {
+void Real2D::renderBlock(int x, int y, int z, block_t block, World* world) {
     GLfloat xi = (GLfloat)UNML(x);
     GLfloat xi1 = (GLfloat)UNML(x + 1);
     GLfloat yi = (GLfloat)UNML(y);
@@ -84,7 +83,7 @@ void Real2D::renderBlock(int x, int y, int z, Block* block, World* world) {
     GLfloat v0 = BLOCK_TEX_V0(id);
     GLfloat v1 = BLOCK_TEX_V1(id);
     GLfloat color;
-    float f = (1.0f / 30.0f)* world->getLight(x, y, z);
+    float f = (1.0f / 30.0f) * world->getLight(x, y, z);
     if (z == 0) {
         color = f;
     }

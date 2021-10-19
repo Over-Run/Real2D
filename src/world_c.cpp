@@ -40,9 +40,9 @@ void WorldRenderer::render(double delta) {
         for (int z = 0; z < WORLD_D; ++z) {
             for (int x = 0; x < WORLD_W; ++x) {
                 for (int y = 0; y < WORLD_H; ++y) {
-                    Block& block = world->getBlock(x, y, z);
-                    if (block != *AIR_BLOCK) {
-                        renderBlock(x, y, z, &block, world);
+                    block_t block = world->getBlock(x, y, z);
+                    if (block != AIR_BLOCK) {
+                        renderBlock(x, y, z, block, world);
                     }
                 }
             }
@@ -73,7 +73,7 @@ void WorldRenderer::pick() {
                 && my >= oby
                 && my < oby1) {
                 selected = true;
-                Block* block = &world->getBlock(x, y, selectz);
+                block_t block = world->getBlock(x, y, selectz);
                 hit_result = new HitResult(x, y, selectz, block);
                 goto unloop;
             }

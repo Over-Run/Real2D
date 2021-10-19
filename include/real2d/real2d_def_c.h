@@ -23,5 +23,5 @@ constexpr auto BLOCK_TEX_UV_FACTOR = (float)BLOCK_TEX_SIZE / (float)BLOCKS_TEX_S
 #define BLOCK_TEX_U1(id) (((id) % BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR)
 #define BLOCK_TEX_V0(id) ((((id) - 1) / BLOCKS_PER_TEX) * BLOCK_TEX_UV_FACTOR)
 #define BLOCK_TEX_V1(id) ((((id) / BLOCKS_PER_TEX) + 1) * BLOCK_TEX_UV_FACTOR)
-#define X_OFFSET(player) ((GLfloat)(int)((Real2D::Window::width * 0.5f) - (int)UNML((player)->prev_x)))
-#define Y_OFFSET(player) ((GLfloat)(int)((Real2D::Window::height * 0.5f) - (int)UNML((player)->prev_y)))
+#define X_OFFSET(p) ((GLfloat)(int)((Real2D::Window::width * 0.5f) - (int)UNML(p->prev_x)))
+#define Y_OFFSET(p) ((GLfloat)(int)((Real2D::Window::height * 0.5f) - (int)UNML(p->prev_y)))

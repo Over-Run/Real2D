@@ -7,9 +7,9 @@
 namespace Real2D {
     class TexMgr {
     public:
-        static std::map<std::string, GLuint> idmap;
+        static std::map<std::string, GLuint> id_map;
         static GLuint loadTexture(std::string img);
-        static void bindTexture(int id);
+        static void bindTexture(GLuint id);
         static void bindTexture(std::string img);
     };
 }

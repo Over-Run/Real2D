@@ -1,5 +1,6 @@
 #pragma once
 #include "block.h"
+#include "real2d_def.h"
 #include "hit.h"
 #include "glad/gl.h"
 #include "real2d_def.h"
@@ -19,10 +20,10 @@ namespace Real2D {
     class World {
     public:
         int version;
-        Player* player;
-        std::vector<WorldListener*>* listeners;
+        block_t world[WORLD_SIZE];
         int lights[WORLD_SIZE];
-        Block world[WORLD_SIZE];
+        std::vector<WorldListener*>* listeners;
+        Player* player;
 
         World();
         ~World();
@@ -32,8 +33,8 @@ namespace Real2D {
         void calcLights(int x, int z);
         int getLight(int x, int y, int z);
         std::vector<AABBox> getCubes(AABBox box);
-        Block& getBlock(int x, int y, int z);
-        void setBlock(int x, int y, int z, Block* block);
+        block_t& getBlock(int x, int y, int z);
+        void setBlock(int x, int y, int z, block_t block);
         void save();
         bool load();
     };

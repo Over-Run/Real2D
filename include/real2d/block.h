@@ -44,6 +44,8 @@ namespace Real2D {
     };
     class World;
 
+    class World;
+
     /// <summary>
     /// Render a block.
     /// </summary>
@@ -52,5 +54,5 @@ namespace Real2D {
     /// <param name="z">Pos z.</param>
     /// <param name="block">The block.</param>
     /// <param name="world">The world.</param>
-    extern void renderBlock(int, int, int, Block*, World*);
+    extern void renderBlock(int, int, int, block_t, World*);
 }

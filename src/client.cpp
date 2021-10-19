@@ -4,6 +4,7 @@
 #include "glad/gl.h"
 #include "real2d/stb_c.h"
 #include "real2d/timer.h"
+#include "real2d/world_c.h"
 #include "real2d/texmgr_c.h"
 #include "real2d/real2d_def_c.h"
 #include "real2d/world_c.h"
@@ -148,7 +149,7 @@ void Client::render(double delta) {
 void Client::tick() {
     world->tick();
 }
-Client::~Client() {
+void Client::close() {
     delete world;
     world = nullptr;
     delete worldRenderer;

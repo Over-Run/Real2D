@@ -35,23 +35,29 @@ bool isMouseDown(int button) {
 }
 
 World::World() :
-    version(WORLD_VER),
-    player(new Player(this)),
-    listeners(new vector<WorldListener*>) {
-    for (int i = 0; i < WORLD_SIZE; ++i) {
-        world[i] = *AIR_BLOCK;
-    }
+    version(WORLD_VER) {
+    listeners = new vector<WorldListener*>();
+    player = new Player(this);
     for (int i = 0; i < WORLD_SIZE; ++i) {
         lights[i] = 15;
     }
+    for (int i = 0; i < WORLD_SIZE; ++i) {
+        lights[i] = 0;
+    }
 }
+
 World::~World() {
     save();
-    delete player;
-    player = nullptr;
-    delete listeners;
-    listeners = nullptr;
+    if (player != nullptr) {
+        delete player;
+        player = nullptr;
+    }
+    if (listeners != nullptr) {
+        delete listeners;
+        listeners = nullptr;
+    }
 }
+
 void World::create() {
     if (!load()) {
         for (int z = 0; z < WORLD_D; ++z) {
@@ -64,7 +70,7 @@ void World::create() {
                     else if (y == 3) {
                         b = BLOCK(GRASS_BLOCK);
                     }
-                    setBlock(x, y, z, b);
+                    world[WORLD_BLOCK_I(x, y, z)] = b;
                 }
             }
         }
@@ -107,9 +113,9 @@ void World::addListener(WorldListener* listener) {
 
 void World::calcLights(int x, int z) {
     int light = 15;
-    for (int y = WORLD_H; y >= 0; y--) {
+    for (int y = WORLD_H - 1; y >= 0; y--) {
         lights[WORLD_BLOCK_I(x, y, z)] = light;
-        if (light > 0 && getBlock(x, y, z).isOpaque()) {
+        if (light > 0 && getBlock(x, y, z)->isOpaque()) {
             --light;
         }
     }
@@ -151,7 +157,7 @@ vector<AABBox> World::getCubes(AABBox box) {
     return cubes;
 }
 
-Block& World::getBlock(int x, int y, int z) {
+block_t& World::getBlock(int x, int y, int z) {
     if (x >= 0 && x < WORLD_W
         && y >= 0 && y < WORLD_H
         && z >= 0 && z < WORLD_D) {
@@ -164,10 +170,10 @@ void World::setBlock(int x, int y, int z, Block* block) {
     if (x >= 0 && x < WORLD_W
         && y >= 0 && y < WORLD_H
         && z >= 0 && z < WORLD_D) {
-        if (world[WORLD_BLOCK_I(x, y, z)] == *block) {
+        if (world[WORLD_BLOCK_I(x, y, z)] == block) {
             return;
         }
-        world[WORLD_BLOCK_I(x, y, z)] = *block;
+        world[WORLD_BLOCK_I(x, y, z)] = block;
         calcLights(x, z);
         for (auto l : *listeners) {
             l->blockChanged(x, y, z);

@@ -7,10 +7,10 @@ using std::map;
 using std::pair;
 using std::string;
 
-std::map<std::string, GLuint> TexMgr::idmap;
+std::map<std::string, GLuint> TexMgr::id_map;
 GLuint TexMgr::loadTexture(string img) {
-    if (idmap.count(img) > 0) {
-        return idmap[img];
+    if (id_map.count(img) > 0) {
+        return id_map[img];
     }
     int w = 0;
     int h = 0;
@@ -39,7 +39,7 @@ GLuint TexMgr::loadTexture(string img) {
         tex
     );
     stbi_image_free(tex);
-    idmap[img] = id;
+    id_map[img] = id;
     delete[] c;
     return id;
 }

@@ -11,6 +11,7 @@ Client client;
 
 int main() {
     client.start();
+    client.close();
     return 0;
 }
 
