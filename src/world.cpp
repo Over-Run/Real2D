@@ -15,8 +15,7 @@ using std::endl;
 using std::vector;
 using std::map;
 using std::string;
-using Real2D::Window;
-using Real2D::block_t;
+using Real2D::Block;
 using Real2D::Blocks;
 using Real2D::Player;
 using Real2D::World;
@@ -26,12 +25,10 @@ using Real2D::Registries;
 
 extern window_t window;
 
-block_t choosingBlock = BLOCK(GRASS_BLOCK);
+Block* choosingBlock = BLOCK(GRASS_BLOCK);
 
 HitResult* hit_result = nullptr;
 int selectz = 1;
-
-extern GLuint blocks;
 
 bool isMouseDown(int button) {
     return glfwGetMouseButton(window, button);
@@ -42,7 +39,7 @@ World::World() :
     listeners = new vector<WorldListener*>();
     player = new Player(this);
     for (int i = 0; i < WORLD_SIZE; ++i) {
-        world[i] = AIR_BLOCK;
+        lights[i] = 15;
     }
     for (int i = 0; i < WORLD_SIZE; ++i) {
         lights[i] = 0;
@@ -66,7 +63,7 @@ void World::create() {
         for (int z = 0; z < WORLD_D; ++z) {
             for (int x = 0; x < WORLD_W; ++x) {
                 for (int y = 0; y < WORLD_H; ++y) {
-                    block_t b = AIR_BLOCK;
+                    Block* b = AIR_BLOCK;
                     if (y < 3) {
                         b = BLOCK(STONE);
                     }
@@ -88,7 +85,7 @@ void World::create() {
 
 void World::tick() {
     if (hit_result != nullptr) {
-        block_t b = hit_result->block;
+        Block* b = hit_result->block;
         int x = hit_result->x;
         int y = hit_result->y;
         int z = hit_result->z;
@@ -148,8 +145,8 @@ vector<AABBox> World::getCubes(AABBox box) {
     }
     for (int x = x0; x < x1; ++x) {
         for (int y = y0; y < y1; ++y) {
-            block_t block = getBlock(x, y, 1);
-            AABBox* cube = block->getCollision();
+            Block& block = getBlock(x, y, 1);
+            AABBox* cube = block.getCollision();
             if (cube != nullptr) {
                 AABBox b;
                 cube->move((float)x, (float)y, 1, &b);
@@ -166,10 +163,10 @@ block_t& World::getBlock(int x, int y, int z) {
         && z >= 0 && z < WORLD_D) {
         return world[WORLD_BLOCK_I(x, y, z)];
     }
-    return AIR_BLOCK;
+    return *AIR_BLOCK;
 }
 
-void World::setBlock(int x, int y, int z, block_t block) {
+void World::setBlock(int x, int y, int z, Block* block) {
     if (x >= 0 && x < WORLD_W
         && y >= 0 && y < WORLD_H
         && z >= 0 && z < WORLD_D) {
@@ -207,7 +204,7 @@ void World::save() {
     }
 
     for (int i = 0; i < WORLD_SIZE; ++i) {
-        int id = Registries::BLOCK->get(world[i]);
+        int id = Registries::BLOCK->get(&world[i]);
         stream_write(level, &id);
     }
 
@@ -248,7 +245,7 @@ bool World::load() {
         for (int i = 0; i < wrdsz; ++i) {
             int id;
             stream_read(level, &id);
-            world[i] = Registries::BLOCK->get(id_map[id]);
+            world[i] = *Registries::BLOCK->get(id_map[id]);
         }
 
         stream_read(level, &player->x);

@@ -43,7 +43,7 @@ GLuint TexMgr::loadTexture(string img) {
     delete[] c;
     return id;
 }
-void TexMgr::bindTexture(GLuint id) {
+void TexMgr::bindTexture(int id) {
     glBindTexture(GL_TEXTURE_2D, id);
 }
 void TexMgr::bindTexture(string img) {

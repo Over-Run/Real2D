@@ -1,7 +1,6 @@
 #include "real2d/player.h"
 #include "real2d/texmgr_c.h"
 #include "real2d/window_c.h"
-#include "real2d/block.h"
 #include "real2d/world.h"
 #include "real2d/real2d_def_c.h"
 #include <cmath>
@@ -10,12 +9,12 @@ using std::vector;
 using Real2D::Player;
 using Real2D::Window;
 using Real2D::AABBox;
-using Real2D::block_t;
+using Real2D::Block;
 
 float headXRot = 0.0f;
 float yRot = 0.0f;
 
-extern block_t choosingBlock;
+extern Block* choosingBlock;
 extern GLuint blocks;
 
 inline bool isKeyDown(int key) {

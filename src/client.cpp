@@ -7,6 +7,7 @@
 #include "real2d/world_c.h"
 #include "real2d/texmgr_c.h"
 #include "real2d/real2d_def_c.h"
+#include "real2d/world_c.h"
 #include <cstdarg>
 #include <cstdlib>
 

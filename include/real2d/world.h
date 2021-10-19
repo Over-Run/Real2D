@@ -3,9 +3,10 @@
 #include "real2d_def.h"
 #include "hit.h"
 #include "glad/gl.h"
+#include "real2d_def.h"
 #include <vector>
 
-extern Real2D::block_t choosingBlock;
+extern Real2D::Block* choosingBlock;
 extern int selectz;
 extern Real2D::HitResult* hit_result;
 

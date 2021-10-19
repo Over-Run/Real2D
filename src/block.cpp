@@ -7,13 +7,13 @@
 using std::string;
 using Real2D::Block;
 using Real2D::AirBlock;
-using Real2D::block_t;
 using Real2D::Blocks;
+using Real2D::World;
 using Real2D::AABBox;
 using Real2D::Registry;
 using Real2D::Registries;
 
-Registry<block_t>* Registries::BLOCK = new Registry(&Blocks::AIR);
+Registry<Block*>* Registries::BLOCK = new Registry(&Blocks::AIR);
 
 Block::Block() {}
 int Block::getId() const {
@@ -63,13 +63,13 @@ void BlockStates::setBlock(const Block& block_) {
 }*/
 
 template<typename T>
-block_t reg(int rawId, string id, T block) {
+Block* reg(int rawId, string id, T block) {
     return Registries::BLOCK->set(rawId, id, block);
 }
 
-block_t Blocks::AIR = reg(0, "air_block", new AirBlock());
-block_t Blocks::GRASS_BLOCK = reg(1, "grass_block", new Block());
-block_t Blocks::STONE = reg(2, "stone", new Block());
+Block* Blocks::AIR = reg(0, "air_block", new AirBlock());
+Block* Blocks::GRASS_BLOCK = reg(1, "grass_block", new Block());
+Block* Blocks::STONE = reg(2, "stone", new Block());
 
 void Real2D::renderBlock(int x, int y, int z, block_t block, World* world) {
     GLfloat xi = (GLfloat)UNML(x);

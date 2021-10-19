@@ -16,7 +16,7 @@ namespace Real2D {
         static Packet* getLastPacket();
     };
     struct PlayerPacketC2S : public PacketC2S {
-        block_t choosingBlock;
+        Block* choosingBlock;
     };
     struct KeyPacketC2S : public PacketC2S {
         int key;

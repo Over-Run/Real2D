@@ -6,7 +6,7 @@ namespace Real2D {
     public:
         Block();
         Block(const Block&) = delete;
-        Block operator=(const Block&) = delete;
+        Block operator=(const Block&);
         bool operator==(const Block&) const;
         bool operator!=(const Block&) const;
         /// <summary>
@@ -24,8 +24,6 @@ namespace Real2D {
         AABBox* getCollision() override;
     };
 
-    using block_t = Real2D::Block*;
-
     /*class BlockStates {
     private:
         int x, y, z;
@@ -38,14 +36,13 @@ namespace Real2D {
         const Block& getBlock();
         void setBlock(const Block& block_);
     };*/
-}
 
-namespace Real2D {
     struct Blocks {
-        static block_t AIR;
-        static block_t GRASS_BLOCK;
-        static block_t STONE;
+        static Block* AIR;
+        static Block* GRASS_BLOCK;
+        static Block* STONE;
     };
+    class World;
 
     class World;
 
