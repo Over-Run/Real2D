@@ -19,7 +19,7 @@ namespace Real2D {
     class World {
     public:
         int version;
-        block_t* world;
+        block_t world[WORLD_SIZE];
         int lights[WORLD_SIZE];
         std::vector<WorldListener*>* listeners;
         Player* player;

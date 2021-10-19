@@ -38,30 +38,27 @@ bool isMouseDown(int button) {
 }
 
 World::World() :
-    version(WORLD_VER),
-    world((block_t*)malloc(sizeof(block_t)* WORLD_SIZE)),
-    listeners(new vector<WorldListener*>),
-    player(new Player(this)) {
+    version(WORLD_VER) {
+    listeners = new vector<WorldListener*>();
+    player = new Player(this);
     for (int i = 0; i < WORLD_SIZE; ++i) {
         world[i] = AIR_BLOCK;
     }
-    for (int z = 0; z < WORLD_D; ++z) {
-        for (int x = 0; x < WORLD_W; ++x) {
-            calcLights(x, z);
-        }
+    for (int i = 0; i < WORLD_SIZE; ++i) {
+        lights[i] = 0;
     }
 }
 
 World::~World() {
     save();
-    if (world != nullptr) {
-        free(world);
-        world = nullptr;
+    if (player != nullptr) {
+        delete player;
+        player = nullptr;
     }
-    delete player;
-    player = nullptr;
-    delete listeners;
-    listeners = nullptr;
+    if (listeners != nullptr) {
+        delete listeners;
+        listeners = nullptr;
+    }
 }
 
 void World::create() {
@@ -81,6 +78,11 @@ void World::create() {
             }
         }
         save();
+    }
+    for (int z = 0; z < WORLD_D; ++z) {
+        for (int x = 0; x < WORLD_W; ++x) {
+            calcLights(x, z);
+        }
     }
 }
 
@@ -114,7 +116,7 @@ void World::addListener(WorldListener* listener) {
 
 void World::calcLights(int x, int z) {
     int light = 15;
-    for (int y = WORLD_H; y >= 0; y--) {
+    for (int y = WORLD_H - 1; y >= 0; y--) {
         lights[WORLD_BLOCK_I(x, y, z)] = light;
         if (light > 0 && getBlock(x, y, z)->isOpaque()) {
             --light;
