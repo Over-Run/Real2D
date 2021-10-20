@@ -41,9 +41,6 @@ World::World() :
     for (int i = 0; i < WORLD_SIZE; ++i) {
         lights[i] = 15;
     }
-    for (int i = 0; i < WORLD_SIZE; ++i) {
-        lights[i] = 0;
-    }
 }
 
 World::~World() {
