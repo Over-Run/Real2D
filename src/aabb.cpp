@@ -101,7 +101,7 @@ bool AABBox::isZCollide(AABBox& b, float axs) {
         return b.start_z <= end_z && b.end_z > end_z;
     }
     if (axs > 0) {
-        return b.end_z >= start_z && start_z < start_z;
+        return b.end_z >= start_z && b.start_z < start_z;
     }
     return false;
 }

@@ -38,7 +38,7 @@ namespace Real2D {
         bool isYCollide(AABBox& b, float axs);
         bool isZCollide(AABBox& b, float axs);
         /// <summary>
-        /// Check b is intersect to self.
+        /// Check b is intersected to self.
         /// </summary>
         /// <param name="b">The other box.</param>
         /// <returns>Is b intersect to self</returns>
